@@ -1,0 +1,1757 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Active RE - Global Presence Map</title>
+  <meta property="og:title" content="Active Re | Global Presence Ma" />
+  <meta property="og:description" content="View our operations by country.​" />
+  <meta name="description" content="A global reinsurance partner offering strategic, ethical, and high-performing solutions across diverse markets.​" />
+  <!--Uber Font-->
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <link rel="stylesheet" href="https://d1a3f4spazzrp4.cloudfront.net/kepler.gl/uber-fonts/4.0.0/superfine.css">
+
+  <!--Kepler css-->
+  <link href="https://unpkg.com/kepler.gl@3.1.8/umd/keplergl.min.css" rel="stylesheet">
+
+  <!--MapBox css-->
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.1.1/mapbox-gl.css" rel="stylesheet">
+  <link href="https://unpkg.com/maplibre-gl@^3/dist/maplibre-gl.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'> 
+  <!-- Load React/Redux -->
+  <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/redux@4.2.1/dist/redux.js" crossorigin></script>
+  <script src="https://unpkg.com/react-redux@8.1.2/dist/react-redux.min.js" crossorigin></script>
+  <script src="https://unpkg.com/styled-components@6.1.8/dist/styled-components.min.js" crossorigin></script>
+  <!-- Load Kepler.gl -->
+  <script src="https://unpkg.com/kepler.gl@3.1.8/umd/keplergl.min.js" crossorigin></script>
+
+  <style type="text/css">
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: linear-gradient(to bottom right, rgb(249, 250, 251), rgb(229, 231, 235));
+    }
+
+    .attrition-link {
+      display: none;
+    }
+
+    .idvBTW .attrition-logo .mapboxgl-ctrl-logo,
+    .idvBTW .mapboxgl-ctrl-attrib,
+    .mapbox-attribution-container {
+      display: none;
+    }
+
+    .map-control {
+      display: none;
+    }
+
+    .idvBTW .attrition-link {
+      display: none;
+    }
+
+    .idvBTW .attrition-link a,
+    .idvBTW .attrition-link .pipe-separator {
+      display: none;
+    }
+
+    .idvBTW .attrition-logo {
+      display: none !important;
+    }
+
+    .ivlSdf {
+      display: none !important;
+    }
+
+    .jKtOAf {
+      display: none !important;
+    }
+
+    .bDvidf .attrition-link {
+      display: none !important;
+    }
+
+    li {
+      font-size: 12px;
+    }
+
+    /* Loading skeleton styles */
+    #map-loading {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to bottom right, rgb(249, 250, 251), rgb(229, 231, 235));
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.3s ease-out;
+    }
+
+    #map-loading.fade-out {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .loading-content {
+      text-align: center;
+      color: rgb(75, 85, 99);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .loading-spinner {
+      width: 64px;
+      height: 64px;
+      border: 4px solid rgb(209, 213, 219);
+      border-top-color: rgb(59, 130, 246);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+      font-size: 16px;
+      font-weight: 600;
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      color: rgb(75, 85, 99);
+      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    .loading-subtext {
+      font-size: 14px;
+      color: rgb(107, 114, 128);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    /* Skeleton pulse animation for additional effect */
+    .skeleton-pulse {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 80%;
+      height: 60%;
+      border-radius: 8px;
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.3) 50%,
+        transparent 100%
+      );
+      background-size: 200% 100%;
+      animation: shimmer 2s infinite;
+      pointer-events: none;
+      opacity: 0.6;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+  </style>
+  <script>
+    // Bloquear la ruedita del mouse (scroll) en toda la página
+    window.addEventListener('wheel', function(e) {
+      e.preventDefault();
+    }, { passive: false });
+    window.addEventListener('mousewheel', function(e) {
+      e.preventDefault();
+    }, { passive: false });
+    window.addEventListener('DOMMouseScroll', function(e) {
+      e.preventDefault();
+    }, { passive: false });
+  </script>
+
+  <!--MapBox token-->
+  <script>
+    /**
+     * Provide your MapBox Token
+     **/
+    const MAPBOX_TOKEN = 'pk.eyJ1IjoiZWRqbzE2IiwiYSI6ImNtY3J4dWVwdDB5dzcybW9odW1tcDBva2cifQ.EYEVfyqoCVUCNcvTZ8EgPQ';
+    const WARNING_MESSAGE = 'Please Provide a Mapbox Token in order to use Kepler.gl. Edit this file and fill out MAPBOX_TOKEN with your access key';
+  </script>
+
+</head>
+
+<body>
+  <!-- Region Buttons and Fullscreen Button -->
+  <div id="region-buttons" style="position: absolute; top: 10px; left: 20px; z-index: 1000; display: flex; flex-direction: column; background-color: #ffffff;border-radius: 8px;
+            box-shadow: 0 4px 32px rgba(0, 0, 0, 0.18) ;">
+    <div style="display: flex; align-items: center; background-color: #00586F; justify-content: space-between;">
+      <h1 class="legend-title" style="margin-bottom: 0;">Our Global Footprint</h1>
+      <div style="display: flex; align-items: center; background-color: #00586F;">
+        <button id="fullscreen-btn" title="See in fullscreen"
+          style="color: #fff; border: none; border-radius: 4px; padding: 4px 0px; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4 4H10V6H6V10H4V4ZM20 4V10H18V6H14V4H20ZM20 20H14V18H18V14H20V20ZM4 20V14H6V18H10V20H4Z"
+              fill="#fff" />
+          </svg>
+        </button>
+        <button id="toggle-legend-btn"
+          style="color: #fff; border: none; border-radius: 4px; padding: 4px 10px; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center;">
+          <span id="toggle-legend-icon">
+            <svg id="icon-up" style="display: none;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+              width="22" height="22">
+              <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+              <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+              <g id="SVGRepo_iconCarrier">
+                <path
+                  d="M5.70711 9.71069C5.31658 10.1012 5.31658 10.7344 5.70711 11.1249L10.5993 16.0123C11.3805 16.7927 12.6463 16.7924 13.4271 16.0117L18.3174 11.1213C18.708 10.7308 18.708 10.0976 18.3174 9.70708C17.9269 9.31655 17.2937 9.31655 16.9032 9.70708L12.7176 13.8927C12.3271 14.2833 11.6939 14.2832 11.3034 13.8927L7.12132 9.71069C6.7308 9.32016 6.09763 9.32016 5.70711 9.71069Z"
+                  fill="#fff"></path>
+              </g>
+            </svg>
+            <svg id="icon-down" style="display: inline;" viewBox="0 0 24 24" fill="none"
+              xmlns="http://www.w3.org/2000/svg" width="22" height="22">
+              <g id="SVGRepo_bgCarrier2" stroke-width="0"></g>
+              <g id="SVGRepo_tracerCarrier2" stroke-linecap="round" stroke-linejoin="round"></g>
+              <g id="SVGRepo_iconCarrier2">
+                <path
+                  d="M18.2929 15.2893C18.6834 14.8988 18.6834 14.2656 18.2929 13.8751L13.4007 8.98766C12.6195 8.20726 11.3537 8.20757 10.5729 8.98835L5.68257 13.8787C5.29205 14.2692 5.29205 14.9024 5.68257 15.2929C6.0731 15.6835 6.70626 15.6835 7.09679 15.2929L11.2824 11.1073C11.673 10.7168 12.3061 10.7168 12.6966 11.1073L16.8787 15.2893C17.2692 15.6798 17.9024 15.6798 18.2929 15.2893Z"
+                  fill="#fff"></path>
+              </g>
+            </svg>
+          </span>
+        </button>
+      </div>
+    </div>
+    <div id="legend-content" style="padding-top:4px; padding-bottom: 4px;">
+      <!-- Country Search Bar -->
+      <div style="padding: 10px 14px 10px 14px; background: #ffffff; position: relative; width: 100%;">
+        <input id="country-search" type="text" placeholder="Search Country..." autocomplete="off"
+          style="width: 100%; padding: 6px 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 12px;" />
+        <div id="country-search-results"
+          style="position: absolute; top: 100%; left: 0; width: 100%; z-index: 2000; background: white; border: 1px solid #ccc; border-top: none;">
+        </div>
+      </div>
+      <script>
+        const COUNTRY_DATA = [["UNITED STATES","NORTH AMERICA","MGA",38.59,-100.91],["SLOVENIA","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE",46.15,15],["EGYPT","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE + MGA",26.82,30.8],["SOUTH AFRICA","EUROPE, MIDDLE EAST & AFRICA","MGA",-30.56,22.94],["GREECE","EUROPE, MIDDLE EAST & AFRICA","MGA",39.07,21.82],["NETHERLANDS","EUROPE, MIDDLE EAST & AFRICA","MGA",52.13,5.29],["BELGIUM","EUROPE, MIDDLE EAST & AFRICA","MGA",50.5,4.47],["FRANCE","EUROPE, MIDDLE EAST & AFRICA","MGA",46.23,2.21],["SPAIN","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE + MGA",40.46,-3.75],["ITALY","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE",41.87,12.57],["ROMANIA","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE",45.94,24.97],["SWITZERLAND","EUROPE, MIDDLE EAST & AFRICA","MGA",46.82,8.23],["AUSTRIA","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE",47.52,14.55],["UNITED KINGDOM","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE + MGA",55.38,-3.44],["DENMARK","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE + MGA",56.26,9.5],["SWEDEN","EUROPE, MIDDLE EAST & AFRICA","MGA",60.13,18.64],["NORWAY","EUROPE, MIDDLE EAST & AFRICA","MGA",60.47,8.47],["POLAND","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE + MGA",51.92,19.15],["GERMANY","EUROPE, MIDDLE EAST & AFRICA","MGA",51.17,10.45],["PERU","LATIN AMERICA & CARIBBEAN","IN-HOUSE + MGA",-9.19,-75.02],["MEXICO","LATIN AMERICA & CARIBBEAN","IN-HOUSE + MGA",22.5,-102],["ARGENTINA","LATIN AMERICA & CARIBBEAN","MGA",-38.42,-63.62],["BRAZIL","LATIN AMERICA & CARIBBEAN","IN-HOUSE",-14.24,-51.93],["CHILE","LATIN AMERICA & CARIBBEAN","IN-HOUSE + MGA",-35.68,-71.54],["COLOMBIA","LATIN AMERICA & CARIBBEAN","MGA",4.57,-74.3],["MALAYSIA","ASIA PACIFIC","IN-HOUSE + MGA",4.21,101.98],["INDONESIA","ASIA PACIFIC","IN-HOUSE + MGA",-0.79,113.92],["PHILIPPINES","ASIA PACIFIC","IN-HOUSE + MGA",12.88,121.77],["NEW ZEALAND","ASIA PACIFIC","MGA",-40.9,174.89],["SINGAPORE","ASIA PACIFIC","IN-HOUSE + MGA",1.35,103.82],["THAILAND","ASIA PACIFIC","IN-HOUSE + MGA",15.87,100.99],["KAZAKHSTAN","ASIA PACIFIC","IN-HOUSE",48.02,66.92],["JAPAN","ASIA PACIFIC","MGA",36.2,138.25],["SOUTH KOREA","ASIA PACIFIC","IN-HOUSE + MGA",35.91,127.77],["VIETNAM","ASIA PACIFIC","IN-HOUSE + MGA",14.06,108.28],["CHINA","ASIA PACIFIC","IN-HOUSE + MGA",35.86,104.2],["TURKIYE","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE + MGA",41,28.97],["INDIA","ASIA PACIFIC","MGA",20.59,78.96],["PAKISTAN","ASIA PACIFIC","IN-HOUSE + MGA",30.38,69.35],["SRI LANKA","ASIA PACIFIC","IN-HOUSE",7.87,80.77],["MOROCCO","EUROPE, MIDDLE EAST & AFRICA","MGA",31.79,-7.09],["ALGERIA","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE + MGA",28.03,1.66],["TUNISIA","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE + MGA",33.89,9.54],["LIBYA","EUROPE, MIDDLE EAST & AFRICA","MGA",26.34,17.23],["GUINEA","EUROPE, MIDDLE EAST & AFRICA","MGA",9.95,-9.7],["TOGO","EUROPE, MIDDLE EAST & AFRICA","MGA",8.62,0.82],["MAURITIUS","EUROPE, MIDDLE EAST & AFRICA","MGA",-20.35,57.55],["SIERRA LEONE","EUROPE, MIDDLE EAST & AFRICA","MGA",8.46,-11.78],["GHANA","EUROPE, MIDDLE EAST & AFRICA","MGA",7.95,-1.02],["NIGERIA","EUROPE, MIDDLE EAST & AFRICA","MGA",9.08,8.68],["CONGO, DEMOCRATIC REPUBLIC OF (DRC)","EUROPE, MIDDLE EAST & AFRICA","MGA",-4.04,21.76],["ANGOLA","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE + MGA",-11.2,17.87],["KENYA","EUROPE, MIDDLE EAST & AFRICA","MGA",-0.02,37.91],["UGANDA","EUROPE, MIDDLE EAST & AFRICA","MGA",1.37,32.29],["MOZAMBIQUE","EUROPE, MIDDLE EAST & AFRICA","MGA",-18.67,35.53],["NAMIBIA","EUROPE, MIDDLE EAST & AFRICA","MGA",-22.96,18.49],["BOTSWANA","EUROPE, MIDDLE EAST & AFRICA","MGA",-22.33,24.68],["IRELAND","EUROPE, MIDDLE EAST & AFRICA","MGA",53.41,-8.24],["MALTA","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE",35.94,14.38],["CYPRUS","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE",35.13,33.43],["BULGARIA","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE",42.73,25.49],["LATVIA","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE",56.88,24.6],["REPUBLIC OF MOLDOVA","EUROPE, MIDDLE EAST & AFRICA","MGA",47.01,28.86],["ARMENIA","ASIA PACIFIC","IN-HOUSE + MGA",40.07,45.04],["KOSOVO","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE",42.6,20.9],["CROATIA","EUROPE, MIDDLE EAST & AFRICA","MGA",45.1,15.2],["CZECH REPUBLIC","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE",49.82,15.47],["SLOVAKIA","EUROPE, MIDDLE EAST & AFRICA","MGA",48.67,19.7],["BELIZE","LATIN AMERICA & CARIBBEAN","IN-HOUSE",17.19,-88.5],["GUATEMALA","LATIN AMERICA & CARIBBEAN","IN-HOUSE + MGA",15.78,-90.23],["EL SALVADOR","LATIN AMERICA & CARIBBEAN","IN-HOUSE + MGA",13.79,-88.9],["HONDURAS","LATIN AMERICA & CARIBBEAN","IN-HOUSE + MGA",15.2,-86.24],["NICARAGUA","LATIN AMERICA & CARIBBEAN","IN-HOUSE + MGA",12.87,-85.21],["COSTA RICA","LATIN AMERICA & CARIBBEAN","IN-HOUSE + MGA",9.75,-83.75],["PANAMA","LATIN AMERICA & CARIBBEAN","IN-HOUSE + MGA",8.54,-80.78],["HAITI","LATIN AMERICA & CARIBBEAN","IN-HOUSE + MGA",18.97,-72.29],["GUYANA","LATIN AMERICA & CARIBBEAN","MGA",4.86,-58.93],["ECUADOR","LATIN AMERICA & CARIBBEAN","IN-HOUSE + MGA",-1.83,-78.18],["PARAGUAY","LATIN AMERICA & CARIBBEAN","IN-HOUSE",-23.44,-58.44],["SURINAME","LATIN AMERICA & CARIBBEAN","IN-HOUSE",3.92,-56.03],["URUGUAY","LATIN AMERICA & CARIBBEAN","IN-HOUSE + MGA",-32.52,-55.77],["PAPUA NEW GUINEA","ASIA PACIFIC","IN-HOUSE",-6.31,143.96],["SOLOMON ISLANDS","ASIA PACIFIC","MGA",-9.65,160.16],["FIJI","ASIA PACIFIC","MGA",-16.58,179.41],["PALAU","ASIA PACIFIC","MGA",7.51,134.58],["COOK ISLANDS","ASIA PACIFIC","MGA",-21.24,-159.78],["KIRIBATI","ASIA PACIFIC","MGA",-3.37,-168.73],["HONG KONG SAR, CHINA","ASIA PACIFIC","IN-HOUSE",22.39,114.1],["BANGLADESH","ASIA PACIFIC","IN-HOUSE",23.68,90.36],["TAIWAN, CHINA","ASIA PACIFIC","IN-HOUSE + MGA",25.03,121.56],["MALDIVES","ASIA PACIFIC","MGA",3.2,73.22],["LEBANON","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE + MGA",33.85,35.86],["JORDAN","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE + MGA",30.59,36.24],["IRAQ","EUROPE, MIDDLE EAST & AFRICA","MGA",33.22,43.68],["KUWAIT","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE + MGA",29.31,47.48],["SAUDI ARABIA","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE + MGA",23.89,45.08],["OMAN","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE + MGA",21.51,55.92],["UNITED ARAB EMIRATES","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE + MGA",23.42,53.85],["ISRAEL","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE + MGA",31.05,34.85],["BAHRAIN","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE + MGA",25.93,50.64],["QATAR","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE + MGA",25.35,51.18],["BHUTAN","ASIA PACIFIC","IN-HOUSE",27.51,90.43],["NEPAL","ASIA PACIFIC","IN-HOUSE",28.39,84.12],["TAJIKISTAN","ASIA PACIFIC","IN-HOUSE + MGA",38.86,71.28],["AZERBAIJAN","ASIA PACIFIC","MGA",40.14,47.58],["GEORGIA","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE + MGA",42.32,43.36],["UZBEKISTAN","ASIA PACIFIC","IN-HOUSE",41.38,64.59],["SAINT KITTS AND NEVIS","LATIN AMERICA & CARIBBEAN","MGA",17.36,-62.78],["BAHAMAS","LATIN AMERICA & CARIBBEAN","IN-HOUSE + MGA",25.03,-77.4],["ANGUILLA","LATIN AMERICA & CARIBBEAN","MGA",18.22,-63.07],["BRITISH VIRGIN ISLANDS","LATIN AMERICA & CARIBBEAN","MGA",18.42,-64.64],["U.S. VIRGIN ISLANDS","NORTH AMERICA","IN-HOUSE + MGA",18.34,-64.9],["CAYMAN ISLANDS","LATIN AMERICA & CARIBBEAN","MGA",19.51,-80.57],["BERMUDA","NORTH AMERICA","MGA",32.32,-64.76],["GUERNSEY","EUROPE, MIDDLE EAST & AFRICA","MGA",49.47,-2.59],["CANADA","NORTH AMERICA","MGA",56.13,-106.35],["ISLE OF MAN","EUROPE, MIDDLE EAST & AFRICA","MGA",54.24,-4.55],["TURKS AND CAICOS ISLANDS","LATIN AMERICA & CARIBBEAN","MGA",21.69,-71.8],["DOMINICA","LATIN AMERICA & CARIBBEAN","MGA",15.41,-61.37],["ST. VINCENT AND THE GRENADINES","LATIN AMERICA & CARIBBEAN","MGA",12.98,-61.29],["PUERTO RICO","NORTH AMERICA","MGA",18.22,-66.59],["DOMINICAN REPUBLIC","LATIN AMERICA & CARIBBEAN","IN-HOUSE + MGA",18.74,-70.16],["JAMAICA","LATIN AMERICA & CARIBBEAN","MGA",18.11,-77.3]]
+        const searchInput = document.getElementById('country-search');
+        const resultsDiv = document.getElementById('country-search-results');
+        let searchTimeout = null;
+        function normalize(str) {
+          return str.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase();
+        }
+        function showResults(results) {
+          resultsDiv.innerHTML = '';
+          if (results.length === 0) return;
+          const ul = document.createElement('ul');
+          ul.style.listStyle = 'none';
+          ul.style.margin = '4px 0 0 0';
+          ul.style.padding = '0';
+          ul.style.background = '#fff';
+          ul.style.border = '1px solid #ccc';
+          ul.style.borderRadius = '6px';
+          ul.style.maxHeight = '180px';
+          ul.style.overflowY = 'auto';
+          ul.style.scrollbarWidth = 'thin';
+          results.forEach(([country, type, region, lat, lng]) => {
+            const li = document.createElement('li');
+            li.textContent = country;
+            li.tabIndex = 0;
+            li.style.padding = '7px 12px';
+            li.style.cursor = 'pointer';
+            li.onmouseenter = () => li.style.background = '#f0f0f0';
+            li.onmouseleave = () => li.style.background = '';
+            li.onclick = () => {
+              resultsDiv.innerHTML = '';
+              searchInput.value = '';
+              focusCountryOnMap(lat, lng);
+            };
+            ul.appendChild(li);
+          });
+          resultsDiv.appendChild(ul);
+        }
+        function focusCountryOnMap(lat, lng) {
+          if (window.store && window.KeplerGl) {
+            // Obtener estado actual del mapa
+            const state = window.store.getState();
+            const mapState = state && state.keplerGl && state.keplerGl.map && state.keplerGl.map.mapState;
+            if (mapState) {
+              const steps = 25;
+              const duration = 600; // ms
+              const interval = duration / steps;
+              const startLat = mapState.latitude;
+              const startLng = mapState.longitude;
+              const startZoom = mapState.zoom;
+              const endLat = lat;
+              const endLng = lng;
+                const endZoom = 3;
+              let currentStep = 0;
+              function easeInOut(t) {
+                return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+              }
+              function animate() {
+                currentStep++;
+                const t = easeInOut(currentStep / steps);
+                const newLat = startLat + (endLat - startLat) * t;
+                const newLng = startLng + (endLng - startLng) * t;
+                  let newZoom = startZoom + (endZoom - startZoom) * t;
+                  if (newZoom > 3) newZoom = 3;
+                  window.store.dispatch(
+                    window.KeplerGl.updateMap({
+                      latitude: newLat,
+                      longitude: newLng,
+                      zoom: newZoom
+                    })
+                  );
+                if (currentStep < steps) {
+                  setTimeout(animate, interval);
+                }
+              }
+              animate();
+            } else {
+              // fallback instant move
+                window.store.dispatch(
+                  window.KeplerGl.updateMap({
+                    latitude: lat,
+                    longitude: lng,
+                    zoom: 3
+                  })
+                );
+            }
+          }
+        }
+        if (searchInput) {
+          searchInput.addEventListener('input', function () {
+            clearTimeout(searchTimeout);
+            const value = normalize(this.value.trim());
+            if (!value) {
+              resultsDiv.innerHTML = '';
+              return;
+            }
+            searchTimeout = setTimeout(() => {
+              const results = COUNTRY_DATA.filter(([country]) => normalize(country).includes(value));
+              showResults(results.slice(0, 10));
+            }, 120);
+          });
+          // Cerrar resultados al hacer click fuera
+          document.addEventListener('click', function (e) {
+            if (!resultsDiv.contains(e.target) && e.target !== searchInput) {
+              resultsDiv.innerHTML = '';
+            }
+          });
+        }
+      </script>
+      <div class="legend-section">
+        <h3 class="section-title">Region</h3>
+        <div class="legend-item region-btn northamerica" onclick="focusRegion('NORTHAMERICA')">
+          <span class="legend-textp" onclick="focusRegion('NORTHAMERICA')">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g clip-path="url(#clip0_1523_33)">
+                <path
+                  d="M10 12.5C11.3807 12.5 12.5 11.3807 12.5 10C12.5 8.61929 11.3807 7.5 10 7.5C8.61929 7.5 7.5 8.61929 7.5 10C7.5 11.3807 8.61929 12.5 10 12.5Z"
+                  fill="#CE5622" />
+                <path fill-rule="evenodd" clip-rule="evenodd"
+                  d="M2.6037 8.75C3.1306 5.60936 5.60936 3.1306 8.75 2.6037V0H11.25V2.6037C14.3906 3.1306 16.8694 5.60936 17.3962 8.75H20V11.25H17.3962C16.8694 14.3906 14.3906 16.8694 11.25 17.3962V20H8.75V17.3962C5.60936 16.8694 3.1306 14.3906 2.6037 11.25H0V8.75H2.6037ZM5 10C5 7.23857 7.23857 5 10 5C12.7614 5 15 7.23857 15 10C15 12.7614 12.7614 15 10 15C7.23857 15 5 12.7614 5 10Z"
+                  fill="#CE5622" />
+              </g>
+              <defs>
+                <clipPath id="clip0_1523_33">
+                  <rect width="20" height="20" fill="white" />
+                </clipPath>
+              </defs>
+            </svg>
+          </span>
+
+          <span onclick="focusRegion('NORTHAMERICA')" class="legend-textp">NORTH AMERICA</span>
+        </div>
+        <div class="legend-item region-btn latam" onclick="focusRegion('LATAM')">
+          <span class="legend-textp" onclick="focusRegion('LATAM')">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g clip-path="url(#clip0_1523_34)">
+                <path
+                  d="M10 12.5C11.3807 12.5 12.5 11.3807 12.5 10C12.5 8.61929 11.3807 7.5 10 7.5C8.61929 7.5 7.5 8.61929 7.5 10C7.5 11.3807 8.61929 12.5 10 12.5Z"
+                  fill="#CE5622" />
+                <path fill-rule="evenodd" clip-rule="evenodd"
+                  d="M2.6037 8.75C3.1306 5.60936 5.60936 3.1306 8.75 2.6037V0H11.25V2.6037C14.3906 3.1306 16.8694 5.60936 17.3962 8.75H20V11.25H17.3962C16.8694 14.3906 14.3906 16.8694 11.25 17.3962V20H8.75V17.3962C5.60936 16.8694 3.1306 14.3906 2.6037 11.25H0V8.75H2.6037ZM5 10C5 7.23857 7.23857 5 10 5C12.7614 5 15 7.23857 15 10C15 12.7614 12.7614 15 10 15C7.23857 15 5 12.7614 5 10Z"
+                  fill="#CE5622" />
+              </g>
+              <defs>
+                <clipPath id="clip0_1523_34">
+                  <rect width="20" height="20" fill="white" />
+                </clipPath>
+              </defs>
+            </svg>
+          </span>
+          <span onclick="focusRegion('LATAM')" class="legend-textp">LATAM AND CARIBBEAN</span>
+        </div>
+        <div class="legend-item region-btn emea" onclick="focusRegion('EMEA')">
+          <span class="legend-textp" onclick="focusRegion('EMEA')">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g clip-path="url(#clip0_1523_35)">
+                <path
+                  d="M10 12.5C11.3807 12.5 12.5 11.3807 12.5 10C12.5 8.61929 11.3807 7.5 10 7.5C8.61929 7.5 7.5 8.61929 7.5 10C7.5 11.3807 8.61929 12.5 10 12.5Z"
+                  fill="#CE5622" />
+                <path fill-rule="evenodd" clip-rule="evenodd"
+                  d="M2.6037 8.75C3.1306 5.60936 5.60936 3.1306 8.75 2.6037V0H11.25V2.6037C14.3906 3.1306 16.8694 5.60936 17.3962 8.75H20V11.25H17.3962C16.8694 14.3906 14.3906 16.8694 11.25 17.3962V20H8.75V17.3962C5.60936 16.8694 3.1306 14.3906 2.6037 11.25H0V8.75H2.6037ZM5 10C5 7.23857 7.23857 5 10 5C12.7614 5 15 7.23857 15 10C15 12.7614 12.7614 15 10 15C7.23857 15 5 12.7614 5 10Z"
+                  fill="#CE5622" />
+              </g>
+              <defs>
+                <clipPath id="clip0_1523_35">
+                  <rect width="20" height="20" fill="white" />
+                </clipPath>
+              </defs>
+            </svg>
+          </span>
+          <span onclick="focusRegion('EMEA')" class="legend-textp">EMEA</span>
+        </div>
+        <div class="legend-item legend-item-group apac" tabindex="0" onclick="focusRegion('APAC')">
+          <span class="legend-textp">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g clip-path="url(#clip0_1523_36)">
+                <path
+                  d="M10 12.5C11.3807 12.5 12.5 11.3807 12.5 10C12.5 8.61929 11.3807 7.5 10 7.5C8.61929 7.5 7.5 8.61929 7.5 10C7.5 11.3807 8.61929 12.5 10 12.5Z"
+                  fill="#CE5622" />
+                <path fill-rule="evenodd" clip-rule="evenodd"
+                  d="M2.6037 8.75C3.1306 5.60936 5.60936 3.1306 8.75 2.6037V0H11.25V2.6037C14.3906 3.1306 16.8694 5.60936 17.3962 8.75H20V11.25H17.3962C16.8694 14.3906 14.3906 16.8694 11.25 17.3962V20H8.75V17.3962C5.60936 16.8694 3.1306 14.3906 2.6037 11.25H0V8.75H2.6037ZM5 10C5 7.23857 7.23857 5 10 5C12.7614 5 15 7.23857 15 10C15 12.7614 12.7614 15 10 15C7.23857 15 5 12.7614 5 10Z"
+                  fill="#CE5622" />
+              </g>
+              <defs>
+                <clipPath id="clip0_1523_36">
+                  <rect width="20" height="20" fill="white" />
+                </clipPath>
+              </defs>
+            </svg>
+          </span>
+          <span class="legend-textp">APAC</span>
+        </div>
+      </div>
+    </div>
+    <!-- Modal -->
+    <div id="region-modal" style="display:none; width:auto; height:auto; background:none;">
+      <div style="background:#ffffff; max-width:240px; min-width:220px; padding:6px 16px; text-align:left;">
+        <div  style="margin-top:6px;margin-bottom:6px; border:1px dashed #aaa;"></div>
+        <h2 id="modal-premium-title" style="text-align:center; font-size:3.2em; color:#00586F; font-weight: 700;"></h2>
+        <p id="modal-text" style="text-align:center;margin-bottom:8px; color:#808080; font-size:0.75em;"></p>
+      </div>
+    </div>
+  </div>
+  <div id="region-buttons2"
+    style="position: absolute; width: max-content; top: 15px; left: 50%; transform: translateX(-50%); z-index: 100; display: flex; flex-direction: column; background-color: #ffffff;border-radius: 8px;box-shadow: 0 4px 32px rgba(0, 0, 0, 0.18) ;">
+    <div class="legend-section" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+      <div class="legend-item-text">
+        <div class="color-box facultative-treaties"></div>
+        <span class="legend-text disabled" data-type="Facultative + Treaties">In- house</span>
+      </div>
+      <div class="legend-item-text">
+        <div class="color-box treaties"></div>
+        <span class="legend-text  disabled" data-type="Treaties">In – house + MGAs</span>
+      </div>
+      <div class="legend-item-text">
+        <div class="color-box facultative"></div>
+        <span class="legend-text disabled" data-type="Facultative">MGAS</span>
+      </div>
+    </div>
+  </div>
+  <div id="region-buttons3"
+    style="position: absolute; top: 50px; left:auto; right: 20px; z-index: 200; display: flex; flex-direction: column;border-radius: 8px;">
+    <div class="legend-section2">
+      <div class="legend-item-text2">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 26 26" xml:space="preserve" width="26" height="26"
+          fill="#00586F">
+          <path
+            d="M0 3.609a2.169 2.169 0 0 1 2.167 -2.167h13a2.169 2.169 0 0 1 2.167 2.167v7.177l-1.914 0.767h-3.141c-0.397 0 -0.722 0.325 -0.722 0.722v2.888c0 0.041 0.005 0.076 0.009 0.117 0.104 2.623 1.088 6.536 4.455 9.095a2.153 2.153 0 0 1 -0.853 0.176h-4.333v-3.61A2.168 2.168 0 0 0 6.5 20.943v3.611H2.167A2.167 2.167 0 0 1 0 22.388zm3.611 7.944c-0.397 0 -0.722 0.325 -0.722 0.722v1.445c0 0.397 0.325 0.722 0.722 0.722h1.445c0.397 0 0.722 -0.325 0.722 -0.722v-1.445c0 -0.397 -0.325 -0.722 -0.722 -0.722zm3.611 0.722v1.445c0 0.397 0.325 0.722 0.722 0.722h1.445c0.397 0 0.722 -0.325 0.722 -0.722v-1.445c0 -0.397 -0.325 -0.722 -0.722 -0.722H7.944c-0.397 0 -0.722 0.325 -0.722 0.722m-4.332 -5.777v1.445c0 0.397 0.325 0.722 0.722 0.722h1.445c0.397 0 0.722 -0.325 0.722 -0.722V6.498c0 -0.397 -0.325 -0.722 -0.722 -0.722H3.611a0.723 0.723 0 0 0 -0.722 0.722m5.055 -0.722c-0.397 0 -0.722 0.325 -0.722 0.722v1.445c0 0.397 0.325 0.722 0.722 0.722h1.445c0.397 0 0.722 -0.325 0.722 -0.722V6.498c0 -0.397 -0.325 -0.722 -0.722 -0.722zm3.612 0.722v1.445c0 0.397 0.325 0.722 0.722 0.722h1.445c0.397 0 0.722 -0.325 0.722 -0.722V6.498c0 -0.397 -0.325 -0.722 -0.722 -0.722h-1.445a0.723 0.723 0 0 0 -0.722 0.722m7.542 5.132a1.081 1.081 0 0 1 0.804 0l5.417 2.167c0.411 0.167 0.682 0.564 0.682 1.007 0 2.858 -1.169 7.619 -6.085 9.669a1.073 1.073 0 0 1 -0.835 0C14.169 22.423 13 17.661 13 14.804c0 -0.442 0.271 -0.839 0.682 -1.007zm4.708 3.895L19.5 13.802v8.482c3.079 -1.489 4.13 -4.469 4.306 -6.758" />
+        </svg>
+        <span style="font-size: 24px; font-weight: 700; color: #D65F00;" class="legend-text  disabled"
+          data-type="Treaties">17</span>
+        <span style="color: #00586F; font-size: 12px;" data-type="Treaties">Cities Active Re Team</span>
+      </div>
+      <div class="legend-item-text2 " style="cursor: pointer;">
+        <svg fill="#00586F" width="26px" height="26px" viewBox="0 0 0.78 0.78" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M0.292 0.455A0.13 0.13 0 1 0 0.163 0.325a0.13 0.13 0 0 0 0.13 0.13m0 -0.195A0.065 0.065 0 1 1 0.228 0.325 0.065 0.065 0 0 1 0.292 0.26M0.195 0.487h0.195a0.13 0.13 0 0 1 0.13 0.13v0.065a0.033 0.033 0 0 1 -0.065 0V0.618A0.065 0.065 0 0 0 0.39 0.552H0.195a0.065 0.065 0 0 0 -0.065 0.065v0.065a0.033 0.033 0 0 1 -0.065 0V0.618A0.13 0.13 0 0 1 0.195 0.487M0.567 0.325a0.195 0.195 0 0 1 -0.057 0.138 0.033 0.033 0 0 1 -0.046 -0.046 0.13 0.13 0 0 0 0 -0.184A0.033 0.033 0 1 1 0.51 0.187a0.195 0.195 0 0 1 0.057 0.138M0.561 0.575A0.033 0.033 0 0 1 0.562 0.529a0.282 0.282 0 0 0 0 -0.408 0.033 0.033 0 0 1 0.045 -0.047 0.347 0.347 0 0 1 0 0.502 0.033 0.033 0 0 1 -0.046 -0.001" />
+        </svg>
+        <span style="font-size: 24px; font-weight: 700; color: #D65F00;" class="legend-text  disabled"
+          data-type="Treaties">11</span>
+        <span style="color: #00586F; font-size: 12px;" data-type="Treaties">Spoken Languages</span>
+        <div class="flag-container">
+          <img src="images/Spanish.png" title="Spanish" alt="Spanish flag">
+          <img src="images/Portuguese.png" title="Portuguese" alt="Portuguese flag">
+          <img src="images/Russian.png" title="Russian" alt="Russian flag">
+          <img src="images/Sweden .png" title="Swedish" alt="Swedish flag">
+          <img src="images/English.png" title="English" alt="English flag">
+          <img src="images/German.png" title="Germ" alt="Germ flag">
+          <img src="images/Hindi.png" title="Hindi" alt="Hindi flag">
+          <img src="images/Cantonese.png" title="Cantonese" alt="Cantonese flag">
+          <img src="images/French.png" title="French" alt="French flag">
+          <img src="images/Italian.png" title="Italian" alt="Italian flag">
+          <img src="images/Arabic.png" title="Arabic" alt="Arabic flag">
+          <img src="images/Turkish.png" title="Turkish" alt="Turkish flag">
+        </div>
+        <script>
+          document.querySelectorAll('.legend-item-text2').forEach(item => {
+            item.addEventListener('click', (e) => {
+              e.stopPropagation();
+              item.classList.toggle('show-flags');
+            });
+          });
+
+          // Ocultar al hacer click fuera
+          document.addEventListener('click', () => {
+            document.querySelectorAll('.legend-item-text2').forEach(item => {
+              item.classList.remove('show-flags');
+            });
+          });
+        </script>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Fullscreen button logic (mantener region-buttons visible)
+    document.addEventListener('DOMContentLoaded', function () {
+      var fullscreenBtn = document.getElementById('fullscreen-btn');
+      var appDiv = document.getElementById('app');
+      var regionButtons = document.getElementById('region-buttons');
+      var regionButtons2 = document.getElementById('region-buttons2');
+      var regionButtons3 = document.getElementById('region-buttons3');
+      if (fullscreenBtn && appDiv) {
+        fullscreenBtn.addEventListener('click', function () {
+          // Si ya está en fullscreen, salir
+          if (!document.fullscreenElement) {
+            // Crear un contenedor para app y region-buttons
+            var fsContainer = document.createElement('div');
+            fsContainer.id = 'fs-container';
+            fsContainer.style.position = 'relative';
+            fsContainer.style.width = '100vw';
+            fsContainer.style.height = '100vh';
+            // Insertar el contenedor antes de appDiv
+            appDiv.parentNode.insertBefore(fsContainer, appDiv);
+            // Mover region-buttons y appDiv al contenedor
+            fsContainer.appendChild(regionButtons);
+            fsContainer.appendChild(regionButtons2);
+            fsContainer.appendChild(regionButtons3);
+            fsContainer.appendChild(appDiv);
+            // Solicitar fullscreen
+            if (fsContainer.requestFullscreen) {
+              fsContainer.requestFullscreen();
+            } else if (fsContainer.webkitRequestFullscreen) {
+              fsContainer.webkitRequestFullscreen();
+            } else if (fsContainer.msRequestFullscreen) {
+              fsContainer.msRequestFullscreen();
+            }
+          } else {
+            if (document.exitFullscreen) {
+              document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+              document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) {
+              document.msExitFullscreen();
+            }
+          }
+        });
+      }
+      // Al salir de fullscreen, devolver los elementos a su lugar
+      document.addEventListener('fullscreenchange', function () {
+        if (!document.fullscreenElement) {
+          var fsContainer = document.getElementById('fs-container');
+          if (fsContainer) {
+            var body = document.body;
+            var appDiv = document.getElementById('app');
+            // Devolver region-buttons y appDiv al body
+            var regionButtons = document.getElementById('region-buttons');
+            var regionButtons2 = document.getElementById('region-buttons2');
+            var regionButtons3 = document.getElementById('region-buttons3');
+            if (regionButtons && body) {
+              body.insertBefore(regionButtons, body.firstChild);
+            }
+            if (regionButtons2 && body) {
+              body.insertBefore(regionButtons2, body.firstChild);
+            }
+            if (regionButtons3 && body) {
+              body.insertBefore(regionButtons3, body.firstChild);
+            }
+            if (appDiv && body) {
+              body.appendChild(appDiv);
+            }
+            fsContainer.remove();
+          }
+        }
+      });
+    });
+    // Accordion toggle for legend content with icon
+    const toggleBtn = document.getElementById('toggle-legend-btn');
+    const legendContent = document.getElementById('legend-content');
+    const iconUp = document.getElementById('icon-up');
+    const iconDown = document.getElementById('icon-down');
+    let legendVisible = true;
+    if (toggleBtn && legendContent && iconUp && iconDown) {
+      toggleBtn.addEventListener('click', function () {
+        legendVisible = !legendVisible;
+        if (legendVisible) {
+          legendContent.style.display = '';
+          iconUp.style.display = 'none';
+          iconDown.style.display = 'inline';
+        } else {
+          legendContent.style.display = 'none';
+          iconUp.style.display = 'inline';
+          iconDown.style.display = 'none';
+        }
+      });
+    }
+  </script>
+  <style>
+    .tab-title {
+      font-size: 1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      padding-bottom: 4px;
+      border-bottom: 3px solid transparent;
+    }
+    .tab-title.active {
+      border-bottom: 3px solid #ff7300;
+    }
+    .container-modal-content{
+      margin-top: 8px; width: 700px; min-width: 700px; max-width: 700px;
+    }
+      .map-container {
+        flex: 0 0 220px;
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        justify-content:center;;
+      }
+      .map-image {
+        height:auto;
+        margin-top:16px;
+        max-height:200px;
+        margin-bottom:16px;
+      }
+    .legend-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: #ffffff;
+      background-color: #00586F;
+      padding: 10px 12px;
+    }
+
+    .legend-section {
+      padding: 0px 14px;
+      margin-bottom: 8px;
+    }
+
+    .legend-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .legend-section2 {
+      padding: 0px 14px;
+      margin-bottom: 4px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .section-title {
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 4px;
+      margin-top: 4px;
+      color: #383838;
+    }
+
+    .legend-item,
+    .legend-item-text,
+    .legend-item-text-2 {
+      display: flex;
+      align-items: center;
+      font-size: 13px;
+    }
+
+    .legend-item-text2 {
+      background-color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 6px;
+      border-radius: 10px;
+      position: relative;
+    }
+
+    /* Contenedor animado, pero sin display al inicio */
+    .flag-container {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(10px);
+      padding: 6px;
+      border-radius: 8px;
+      z-index: 10;
+      gap: 4px;
+      flex-wrap: wrap;
+      justify-content: center;
+      max-width: 200px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    /* Mostrar el contenedor */
+    .legend-item-text2:hover .flag-container,
+    .legend-item-text2.show-flags .flag-container {
+      display: flex;
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* Animación fade-in con delay secuencial */
+    .flag-container img {
+      opacity: 0;
+      transform: translateY(5px);
+      animation: fadeIn 0.4s forwards;
+    }
+
+    /* Secuencia con delay (puedes ajustar los tiempos) */
+    .flag-container img:nth-child(1) {
+      animation-delay: 0.1s;
+    }
+
+    .flag-container img:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .flag-container img:nth-child(3) {
+      animation-delay: 0.3s;
+    }
+
+    .flag-container img:nth-child(4) {
+      animation-delay: 0.4s;
+    }
+
+    .flag-container img:nth-child(5) {
+      animation-delay: 0.5s;
+    }
+
+    .flag-container img:nth-child(6) {
+      animation-delay: 0.6s;
+    }
+
+    .flag-container img:nth-child(7) {
+      animation-delay: 0.7s;
+    }
+
+    .flag-container img:nth-child(8) {
+      animation-delay: 0.8s;
+    }
+
+    .flag-container img:nth-child(9) {
+      animation-delay: 0.9s;
+    }
+
+    .flag-container img:nth-child(10) {
+      animation-delay: 1.0s;
+    }
+    .flag-container img:nth-child(11) {
+      animation-delay: 1.1s;
+    }
+    .flag-container img:nth-child(12) {
+      animation-delay: 1.2s;
+    }
+    /* Definición de animación */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(5px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .text-modal{
+      font-size:1em;
+    }
+
+    .flag-container img {
+      object-fit: contain;
+      margin-bottom: 2px;
+    }
+
+    .legend-item-text-2 .legend-item:hover,
+    .legend-item:focus,
+    .legend-item-group:hover,
+    .legend-item-group:focus {
+      background-color: #00586F;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .legend-item:hover .legend-textp,
+    .legend-item:focus .legend-textp,
+    .legend-item-group:hover .legend-textp,
+    .legend-item-group:focus .legend-textp {
+      color: #fff;
+    }
+
+    .legend-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .color-box {
+      width: 16px;
+      height: 16px;
+      margin-right: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .all {
+      background-color: #ffffff;
+    }
+
+    /* Type of Reinsurance Colors */
+    .facultative {
+      background-color: #D65F00;
+    }
+
+    .facultative-treaties {
+      background-color: #C5A266;
+    }
+
+    .treaties {
+      background-color: #00586F;
+    }
+
+    .legend-text {
+      color: #808080;
+      line-height: 1.4;
+      padding: 4px;
+    }
+
+    .legend-textp {
+      color: #808080;
+      line-height: 1.4;
+      cursor: pointer;
+      padding: 3px;
+    }
+
+    .legend-textp:hover {
+      color: #ffff;
+    }
+
+    .legend-item:hover {
+      background-color: #00586F;
+    }
+
+    .legend-item.active {
+      background-color: #00586F !important;
+      color: #fff !important;
+    }
+
+    .legend-item.active .legend-textp {
+      color: #fff !important;
+    }
+
+    /* @media (max-width: 600px) {
+      .legend-title {
+        font-size: 10px !important;
+        padding: 8px 10px !important;
+      }
+      .legend-section {
+        padding: 0px 8px !important;
+        margin-bottom: 10px !important;
+      }
+      .section-title {
+        font-size: 12px !important;
+        margin-bottom: 8px !important;
+      }
+      .legend-item {
+        font-size: 11px !important;
+        margin-bottom: 5px !important;
+      }
+      .color-box {
+        width: 12px !important;
+        height: 12px !important;
+        margin-right: 8px !important;
+      }
+      .region-modal {
+        display: none !important;
+      }
+    } */
+  </style>
+
+  <!-- Loading skeleton -->
+  <div id="map-loading">
+    <div class="skeleton-pulse"></div>
+    <div class="loading-content">
+      <div class="loading-spinner"></div>
+      <div class="loading-text" style="margin-top: 80px;">Loading Geographical Scope...</div>
+    </div>
+  </div>
+
+  <div id="app" style="background: linear-gradient(to bottom right, rgb(249, 250, 251), rgb(229, 231, 235)); width: 100%; height: 100vh;">
+    <!-- Kepler.gl map will be placed here-->
+  </div>
+  <script>
+    // Region data: center coordinates and modal info
+    let filterType = null;
+    // Default fallback REGION_DATA
+    const REGION_DATA_FALLBACK = {
+      NORTHAMERICA: {
+        center: { lat: 38, lng: -97, zoom: 3 },
+        title: 'NORTH AMERICA',
+        text: 'This region represents 18% of our Gross Written Premiums by region in our 2024 portfolio profile. Through our regional network, we provide industry-leading expertise and innovative reinsurance solutions.'
+      },
+      LATAM: {
+        center: { lat: -6.24, lng: -51.93, zoom: 3 },
+        title: 'LATAM AND CARRIBEAN',
+        text: 'This region represents 27% of our Gross Written Premiums by region in the 2024 portfolio profile, supported by region-specific solutions and a deep understanding of the market.'
+      },
+      EMEA: {
+        center: { lat: 40.46, lng: 10.45, zoom: 3 },
+        title: 'EMEA: EUROPE, MIDDLE EAST AND AFRICA',
+        text: 'This region represents 36% of our Gross Written Premiums by region in our 2024 portfolio profile. Our presence across diverse markets in EMEA is supported by tailored solutions and a commitment to long-term partnerships.'
+      },
+      APAC: {
+        center: { lat: 20.59, lng: 110.0, zoom: 3 },
+        title: 'APAC: ASIA-PACIFIC',
+        text: 'This region represents 19% of our Gross Written Premiums by Region in our 2024 portfolio profile. Our expanding presence in APAC reflects our strategic focus on high-growth markets and long-term value creation.'
+      },
+    };
+
+    // Map region code from API to REGION_DATA key and center
+    const REGION_KEY_MAP = {
+      'NORTH AMERICA': { key: 'NORTHAMERICA', center: { lat: 38, lng: -97, zoom: 3 } },
+      'LATAM AND CARRIBEAN': { key: 'LATAM', center: { lat: -6.24, lng: -51.93, zoom: 3 } },
+      'EMEA': { key: 'EMEA', center: { lat: 40.46, lng: 10.45, zoom: 3 } },
+      'APAC': { key: 'APAC', center: { lat: 20.59, lng: 110.0, zoom: 3 } },
+    };
+
+    let REGION_DATA = {};
+
+    async function fetchRegionData() {
+      try {
+        const response = await fetch('https://active-re-web-back-bhgdggh3b4amhsa0.eastus-01.azurewebsites.net/items/global_presence?limit=10');
+        const json = await response.json();
+        if (!json.data || !Array.isArray(json.data)) throw new Error('Invalid data');
+        const regionData = {};
+        json.data.forEach(item => {
+          // Map API code to our keys and centers
+          const map = REGION_KEY_MAP[item.code.trim().toUpperCase()];
+          if (map) {
+            regionData[map.key] = {
+              center: map.center,
+              title: item.code,
+              text: item.content,
+              premium_title: item.percentage_of_premiums
+            };
+          }
+        });
+        // If we got at least one region, use it
+        if (Object.keys(regionData).length > 0) {
+          REGION_DATA = regionData;
+        } else {
+          REGION_DATA = REGION_DATA_FALLBACK;
+        }
+      } catch (e) {
+        REGION_DATA = REGION_DATA_FALLBACK;
+      }
+    }
+
+    // Fetch region data on load (synchronously for rest of code)
+    // If you need REGION_DATA immediately, use async/await or .then()
+    fetchRegionData();
+    function filterTypeHandler(type, el) {
+      // Solo permitir filtrar si los datos están inicializados y el botón no está deshabilitado
+      document.getElementById("type").value = type;
+      if (type === 'All') {
+        filterType = ["Facultative", "Facultative + Treaties", "Treaties"];
+      } else {
+        filterType = [type];
+      }
+      document.querySelectorAll('.filter-type').forEach(e => e.classList.remove('active'));
+      el.classList.add('active');
+    }
+
+    // Focus map and show modal
+    function focusRegion(regionKey) {
+      const region = REGION_DATA[regionKey];
+      if (!region) return;
+      // Animated map movement
+      if (window.store && window.KeplerGl) {
+        // El zoom siempre está bloqueado, incluso durante la animación
+        // Get current map state
+        const state = window.store.getState();
+        const mapState = state && state.keplerGl && state.keplerGl.map && state.keplerGl.map.mapState;
+        if (mapState) {
+          const steps = 25;
+          const duration = 600; // ms
+          const interval = duration / steps;
+          const startLat = mapState.latitude;
+          const startLng = mapState.longitude;
+          const startZoom = mapState.zoom;
+          const endLat = region.center.lat;
+          const endLng = region.center.lng;
+            const endZoom = 3;
+          let currentStep = 0;
+          function easeInOut(t) {
+            return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+          }
+          function animate() {
+            currentStep++;
+            const t = easeInOut(currentStep / steps);
+            const lat = startLat + (endLat - startLat) * t;
+            const lng = startLng + (endLng - startLng) * t;
+              const zoom = 3; // Mantener el zoom fijo
+            window.store.dispatch(
+              window.KeplerGl.updateMap({
+                latitude: lat,
+                longitude: lng,
+                zoom: zoom,
+                isZoomLocked: true
+              })
+            );
+            if (currentStep < steps) {
+              setTimeout(animate, interval);
+            }
+          }
+          animate();
+        } else {
+          // fallback
+            window.store.dispatch(
+              window.KeplerGl.updateMap({
+                latitude: region.center.lat,
+                longitude: region.center.lng,
+                zoom: 3,
+                isZoomLocked: true
+              })
+            );
+        }
+      }
+      // Highlight region buttons
+      const btns = document.querySelectorAll('.region-btn');
+      btns.forEach(btn => btn.classList.remove('active'));
+      const regionClass = regionKey.toLowerCase();
+      document.querySelectorAll('.region-btn.' + regionClass).forEach(btn => btn.classList.add('active'));
+      // Show modal
+      document.getElementById('modal-text').innerText = region.text;
+      document.getElementById('modal-premium-title').innerText = `${region.premium_title}%`;
+      document.getElementById('region-modal').style.display = 'flex';
+    }
+
+    function closeRegionModal() {
+      document.getElementById('region-modal').style.display = 'none';
+    }
+  </script>
+  <!-- Load our React component. -->
+  <script>
+    /* Validate Mapbox Token */
+    if ((MAPBOX_TOKEN || '') === '' || MAPBOX_TOKEN === 'PROVIDE_MAPBOX_TOKEN') {
+      alert(WARNING_MESSAGE);
+    }
+
+    /** STORE **/
+    const reducers = (function createReducers(redux, keplerGl) {
+      return redux.combineReducers({
+        // mount keplerGl reducer
+        keplerGl: keplerGl.keplerGlReducer.initialState({
+          uiState: {
+            readOnly: true,
+            currentModal: null
+          }
+        })
+      });
+    }(Redux, KeplerGl));
+
+    const middleWares = (function createMiddlewares(keplerGl) {
+      return keplerGl.enhanceReduxMiddleware([
+        // Add other middlewares here
+      ]);
+    }(KeplerGl));
+
+    const enhancers = (function craeteEnhancers(redux, middles) {
+      return redux.applyMiddleware(...middles);
+    }(Redux, middleWares));
+
+    const store = (function createStore(redux, enhancers) {
+      const initialState = {};
+
+      return redux.createStore(
+        reducers,
+        initialState,
+        redux.compose(enhancers)
+      );
+    }(Redux, enhancers));
+    window.store = store;
+    window.KeplerGl = KeplerGl;
+    /** END STORE **/
+
+    /** COMPONENTS **/
+    var KeplerElement = (function makeKeplerElement(react, keplerGl, mapboxToken) {
+
+      return function App() {
+        var rootElm = react.useRef(null);
+        var _useState = react.useState({
+          width: window.innerWidth,
+          height: window.innerHeight
+        });
+        var windowDimension = _useState[0];
+        var setDimension = _useState[1];
+        react.useEffect(function sideEffect() {
+          function handleResize() {
+            setDimension({ width: window.innerWidth, height: window.innerHeight });
+          };
+          window.addEventListener('resize', handleResize);
+          return function () { window.removeEventListener('resize', handleResize); };
+        }, []);
+          return react.createElement(
+            'div',
+            { style: { position: 'absolute', left: 0, width: '100vw', height: '100vh' } },
+            react.createElement(keplerGl.KeplerGl, {
+              mapboxApiAccessToken: mapboxToken,
+              id: "map",
+              width: windowDimension.width,
+              height: windowDimension.height,
+              maxZoom: 3
+            })
+          )
+      }
+    }(React, KeplerGl, MAPBOX_TOKEN));
+
+    const app = (function createReactReduxProvider(react, reactRedux, KeplerElement) {
+      return react.createElement(
+        reactRedux.Provider,
+        { store },
+        react.createElement(KeplerElement, null)
+      )
+    }(React, ReactRedux, KeplerElement));
+    /** END COMPONENTS **/
+
+    /** Render **/
+    (function render(react, reactDOM, app) {
+      const container = document.getElementById('app');
+      const root = reactDOM.createRoot(container);
+      root.render(app);
+
+      // Bloquear zoom solo en el mapa Kepler.gl
+      container.addEventListener('wheel', function(e) { e.preventDefault(); }, { passive: false });
+      container.addEventListener('mousewheel', function(e) { e.preventDefault(); }, { passive: false });
+      container.addEventListener('DOMMouseScroll', function(e) { e.preventDefault(); }, { passive: false });
+      container.addEventListener('touchstart', function(e) {
+        if (e.touches && e.touches.length > 1) e.preventDefault();
+      }, { passive: false });
+      container.addEventListener('touchmove', function(e) {
+        if (e.touches && e.touches.length > 1) e.preventDefault();
+      }, { passive: false });
+
+  // Overlay para bloquear zoom
+  const zoomBlocker = document.createElement('div');
+  zoomBlocker.style.position = 'absolute';
+  zoomBlocker.style.top = '0';
+  zoomBlocker.style.left = '0';
+  zoomBlocker.style.width = '100vw';
+  zoomBlocker.style.height = '100vh';
+  zoomBlocker.style.zIndex = '9999';
+  zoomBlocker.style.background = 'transparent';
+  zoomBlocker.style.pointerEvents = 'auto';
+  zoomBlocker.setAttribute('id', 'zoom-blocker');
+  // Bloquear eventos de wheel y touch
+  zoomBlocker.addEventListener('wheel', function(e) { e.preventDefault(); }, { passive: false });
+  zoomBlocker.addEventListener('touchstart', function(e) { e.preventDefault(); }, { passive: false });
+  zoomBlocker.addEventListener('touchmove', function(e) { e.preventDefault(); }, { passive: false });
+  container.appendChild(zoomBlocker);
+      }(React, ReactDOM, app));
+
+  </script>
+  <script>
+
+    (function customize(keplerGl, store) {
+      
+      // Fetch data from API with fallback to example data
+      let data = [];
+      async function fetchData() {
+        try {
+          const response = await fetch('https://active-re-web-back-bhgdggh3b4amhsa0.eastus-01.azurewebsites.net/items/global_presence_countries?limit=-1');
+          const jsonData = await response.json();
+          
+          // Transform API response to expected format
+          data = jsonData.data.map(item => [
+            item.Country,
+            item.Type,
+            item.Region,
+            parseFloat(item.Lat),
+            parseFloat(item.Long)
+          ]);
+        } catch (error) {
+          console.log('Error fetching data, using fallback:', error);
+          // Fallback data
+          data = [["UNITED STATES","NORTH AMERICA","MGA",38.59,-100.91],["SLOVENIA","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE",46.15,15],["EGYPT","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE + MGA",26.82,30.8],["SOUTH AFRICA","EUROPE, MIDDLE EAST & AFRICA","MGA",-30.56,22.94],["GREECE","EUROPE, MIDDLE EAST & AFRICA","MGA",39.07,21.82],["NETHERLANDS","EUROPE, MIDDLE EAST & AFRICA","MGA",52.13,5.29],["BELGIUM","EUROPE, MIDDLE EAST & AFRICA","MGA",50.5,4.47],["FRANCE","EUROPE, MIDDLE EAST & AFRICA","MGA",46.23,2.21],["SPAIN","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE + MGA",40.46,-3.75],["ITALY","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE",41.87,12.57],["ROMANIA","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE",45.94,24.97],["SWITZERLAND","EUROPE, MIDDLE EAST & AFRICA","MGA",46.82,8.23],["AUSTRIA","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE",47.52,14.55],["UNITED KINGDOM","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE + MGA",55.38,-3.44],["DENMARK","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE + MGA",56.26,9.5],["SWEDEN","EUROPE, MIDDLE EAST & AFRICA","MGA",60.13,18.64],["NORWAY","EUROPE, MIDDLE EAST & AFRICA","MGA",60.47,8.47],["POLAND","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE + MGA",51.92,19.15],["GERMANY","EUROPE, MIDDLE EAST & AFRICA","MGA",51.17,10.45],["PERU","LATIN AMERICA & CARIBBEAN","IN-HOUSE + MGA",-9.19,-75.02],["MEXICO","LATIN AMERICA & CARIBBEAN","IN-HOUSE + MGA",22.5,-102],["ARGENTINA","LATIN AMERICA & CARIBBEAN","MGA",-38.42,-63.62],["BRAZIL","LATIN AMERICA & CARIBBEAN","IN-HOUSE",-14.24,-51.93],["CHILE","LATIN AMERICA & CARIBBEAN","IN-HOUSE + MGA",-35.68,-71.54],["COLOMBIA","LATIN AMERICA & CARIBBEAN","MGA",4.57,-74.3],["MALAYSIA","ASIA PACIFIC","IN-HOUSE + MGA",4.21,101.98],["INDONESIA","ASIA PACIFIC","IN-HOUSE + MGA",-0.79,113.92],["PHILIPPINES","ASIA PACIFIC","IN-HOUSE + MGA",12.88,121.77],["NEW ZEALAND","ASIA PACIFIC","MGA",-40.9,174.89],["SINGAPORE","ASIA PACIFIC","IN-HOUSE + MGA",1.35,103.82],["THAILAND","ASIA PACIFIC","IN-HOUSE + MGA",15.87,100.99],["KAZAKHSTAN","ASIA PACIFIC","IN-HOUSE",48.02,66.92],["JAPAN","ASIA PACIFIC","MGA",36.2,138.25],["SOUTH KOREA","ASIA PACIFIC","IN-HOUSE + MGA",35.91,127.77],["VIETNAM","ASIA PACIFIC","IN-HOUSE + MGA",14.06,108.28],["CHINA","ASIA PACIFIC","IN-HOUSE + MGA",35.86,104.2],["TURKIYE","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE + MGA",41,28.97],["INDIA","ASIA PACIFIC","MGA",20.59,78.96],["PAKISTAN","ASIA PACIFIC","IN-HOUSE + MGA",30.38,69.35],["SRI LANKA","ASIA PACIFIC","IN-HOUSE",7.87,80.77],["MOROCCO","EUROPE, MIDDLE EAST & AFRICA","MGA",31.79,-7.09],["ALGERIA","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE + MGA",28.03,1.66],["TUNISIA","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE + MGA",33.89,9.54],["LIBYA","EUROPE, MIDDLE EAST & AFRICA","MGA",26.34,17.23],["GUINEA","EUROPE, MIDDLE EAST & AFRICA","MGA",9.95,-9.7],["TOGO","EUROPE, MIDDLE EAST & AFRICA","MGA",8.62,0.82],["MAURITIUS","EUROPE, MIDDLE EAST & AFRICA","MGA",-20.35,57.55],["SIERRA LEONE","EUROPE, MIDDLE EAST & AFRICA","MGA",8.46,-11.78],["GHANA","EUROPE, MIDDLE EAST & AFRICA","MGA",7.95,-1.02],["NIGERIA","EUROPE, MIDDLE EAST & AFRICA","MGA",9.08,8.68],["CONGO, DEMOCRATIC REPUBLIC OF (DRC)","EUROPE, MIDDLE EAST & AFRICA","MGA",-4.04,21.76],["ANGOLA","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE + MGA",-11.2,17.87],["KENYA","EUROPE, MIDDLE EAST & AFRICA","MGA",-0.02,37.91],["UGANDA","EUROPE, MIDDLE EAST & AFRICA","MGA",1.37,32.29],["MOZAMBIQUE","EUROPE, MIDDLE EAST & AFRICA","MGA",-18.67,35.53],["NAMIBIA","EUROPE, MIDDLE EAST & AFRICA","MGA",-22.96,18.49],["BOTSWANA","EUROPE, MIDDLE EAST & AFRICA","MGA",-22.33,24.68],["IRELAND","EUROPE, MIDDLE EAST & AFRICA","MGA",53.41,-8.24],["MALTA","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE",35.94,14.38],["CYPRUS","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE",35.13,33.43],["BULGARIA","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE",42.73,25.49],["LATVIA","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE",56.88,24.6],["REPUBLIC OF MOLDOVA","EUROPE, MIDDLE EAST & AFRICA","MGA",47.01,28.86],["ARMENIA","ASIA PACIFIC","IN-HOUSE + MGA",40.07,45.04],["KOSOVO","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE",42.6,20.9],["CROATIA","EUROPE, MIDDLE EAST & AFRICA","MGA",45.1,15.2],["CZECH REPUBLIC","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE",49.82,15.47],["SLOVAKIA","EUROPE, MIDDLE EAST & AFRICA","MGA",48.67,19.7],["BELIZE","LATIN AMERICA & CARIBBEAN","IN-HOUSE",17.19,-88.5],["GUATEMALA","LATIN AMERICA & CARIBBEAN","IN-HOUSE + MGA",15.78,-90.23],["EL SALVADOR","LATIN AMERICA & CARIBBEAN","IN-HOUSE + MGA",13.79,-88.9],["HONDURAS","LATIN AMERICA & CARIBBEAN","IN-HOUSE + MGA",15.2,-86.24],["NICARAGUA","LATIN AMERICA & CARIBBEAN","IN-HOUSE + MGA",12.87,-85.21],["COSTA RICA","LATIN AMERICA & CARIBBEAN","IN-HOUSE + MGA",9.75,-83.75],["PANAMA","LATIN AMERICA & CARIBBEAN","IN-HOUSE + MGA",8.54,-80.78],["HAITI","LATIN AMERICA & CARIBBEAN","IN-HOUSE + MGA",18.97,-72.29],["GUYANA","LATIN AMERICA & CARIBBEAN","MGA",4.86,-58.93],["ECUADOR","LATIN AMERICA & CARIBBEAN","IN-HOUSE + MGA",-1.83,-78.18],["PARAGUAY","LATIN AMERICA & CARIBBEAN","IN-HOUSE",-23.44,-58.44],["SURINAME","LATIN AMERICA & CARIBBEAN","IN-HOUSE",3.92,-56.03],["URUGUAY","LATIN AMERICA & CARIBBEAN","IN-HOUSE + MGA",-32.52,-55.77],["PAPUA NEW GUINEA","ASIA PACIFIC","IN-HOUSE",-6.31,143.96],["SOLOMON ISLANDS","ASIA PACIFIC","MGA",-9.65,160.16],["FIJI","ASIA PACIFIC","MGA",-16.58,179.41],["PALAU","ASIA PACIFIC","MGA",7.51,134.58],["COOK ISLANDS","ASIA PACIFIC","MGA",-21.24,-159.78],["KIRIBATI","ASIA PACIFIC","MGA",-3.37,-168.73],["HONG KONG SAR, CHINA","ASIA PACIFIC","IN-HOUSE",22.39,114.1],["BANGLADESH","ASIA PACIFIC","IN-HOUSE",23.68,90.36],["TAIWAN, CHINA","ASIA PACIFIC","IN-HOUSE + MGA",25.03,121.56],["MALDIVES","ASIA PACIFIC","MGA",3.2,73.22],["LEBANON","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE + MGA",33.85,35.86],["JORDAN","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE + MGA",30.59,36.24],["IRAQ","EUROPE, MIDDLE EAST & AFRICA","MGA",33.22,43.68],["KUWAIT","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE + MGA",29.31,47.48],["SAUDI ARABIA","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE + MGA",23.89,45.08],["OMAN","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE + MGA",21.51,55.92],["UNITED ARAB EMIRATES","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE + MGA",23.42,53.85],["ISRAEL","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE + MGA",31.05,34.85],["BAHRAIN","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE + MGA",25.93,50.64],["QATAR","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE + MGA",25.35,51.18],["BHUTAN","ASIA PACIFIC","IN-HOUSE",27.51,90.43],["NEPAL","ASIA PACIFIC","IN-HOUSE",28.39,84.12],["TAJIKISTAN","ASIA PACIFIC","IN-HOUSE + MGA",38.86,71.28],["AZERBAIJAN","ASIA PACIFIC","MGA",40.14,47.58],["GEORGIA","EUROPE, MIDDLE EAST & AFRICA","IN-HOUSE + MGA",42.32,43.36],["UZBEKISTAN","ASIA PACIFIC","IN-HOUSE",41.38,64.59],["SAINT KITTS AND NEVIS","LATIN AMERICA & CARIBBEAN","MGA",17.36,-62.78],["BAHAMAS","LATIN AMERICA & CARIBBEAN","IN-HOUSE + MGA",25.03,-77.4],["ANGUILLA","LATIN AMERICA & CARIBBEAN","MGA",18.22,-63.07],["BRITISH VIRGIN ISLANDS","LATIN AMERICA & CARIBBEAN","MGA",18.42,-64.64],["U.S. VIRGIN ISLANDS","NORTH AMERICA","IN-HOUSE + MGA",18.34,-64.9],["CAYMAN ISLANDS","LATIN AMERICA & CARIBBEAN","MGA",19.51,-80.57],["BERMUDA","NORTH AMERICA","MGA",32.32,-64.76],["GUERNSEY","EUROPE, MIDDLE EAST & AFRICA","MGA",49.47,-2.59],["CANADA","NORTH AMERICA","MGA",56.13,-106.35],["ISLE OF MAN","EUROPE, MIDDLE EAST & AFRICA","MGA",54.24,-4.55],["TURKS AND CAICOS ISLANDS","LATIN AMERICA & CARIBBEAN","MGA",21.69,-71.8],["DOMINICA","LATIN AMERICA & CARIBBEAN","MGA",15.41,-61.37],["ST. VINCENT AND THE GRENADINES","LATIN AMERICA & CARIBBEAN","MGA",12.98,-61.29],["PUERTO RICO","NORTH AMERICA","MGA",18.22,-66.59],["DOMINICAN REPUBLIC","LATIN AMERICA & CARIBBEAN","IN-HOUSE + MGA",18.74,-70.16],["JAMAICA","LATIN AMERICA & CARIBBEAN","MGA",18.11,-77.3]]
+      }}
+      let filterTypes = ["Facultative", "Facultative + Treaties", "Treaties"]
+      // Initialize empty datasets
+      let datasets = [];
+
+      // Function to create datasets with the data
+      function createDatasets(data) {
+        return [{ 
+          "version": "v1", 
+          "data": { 
+            "id": "dthh84", 
+            "label": "map.csv", 
+            "color": [62, 172, 168], 
+            "allData": data, 
+            "fields": [
+              { "name": "Country", "type": "string", "format": "", "analyzerType": "STRING" }, 
+              { "name": "Type", "type": "string", "format": "", "analyzerType": "STRING" }, 
+              { "name": "Region", "type": "string", "format": "", "analyzerType": "STRING" }, 
+              { "name": "Lat", "type": "real", "format": "", "analyzerType": "FLOAT" }, 
+              { "name": "Long", "type": "real", "format": "", "analyzerType": "FLOAT" }
+            ], 
+            "type": "", 
+            "metadata": { 
+              "id": "dthh84", 
+              "format": "row", 
+              "label": "map.csv" 
+            }, 
+            "disableDataOperation": false 
+          } 
+        }];
+      };
+      
+          const config = {"version":"v1","config":{"visState":{"filters":[],"layers":[{"id":"aw4z76i","type":"point","config":{"dataId":"dthh84","columnMode":"points","label":"Click to see more","color":[231,159,213],"highlightColor":[252,242,26,255],"columns":{"lat":"Lat","lng":"Long"},"isVisible":true,"visConfig":{"radius":20,"fixedRadius":false,"opacity":0.8,"outline":false,"thickness":2,"strokeColor":null,"colorRange":{"name":"color.customPalette.customOrdinal.Type","type":"customOrdinal","category":"Custom","colors":["#C5A266","#00586F","#D65F00"],"colorMap":[["IN-HOUSE","#C5A266"],["IN-HOUSE + MGA","#00586F"],["MGA","#D65F00"]]},"strokeColorRange":{"name":"Global Warming","type":"sequential","category":"Uber","colors":["#4C0035","#880030","#B72F15","#D6610A","#EF9100","#FFC300"]},"radiusRange":[0,50],"filled":true,"billboard":false,"allowHover":true,"showNeighborOnHover":false,"showHighlightColor":true},"hidden":false,"textLabel":[{"field":null,"color":[255,255,255],"size":18,"offset":[0,0],"anchor":"start","alignment":"center","outlineWidth":0,"outlineColor":[255,0,0,255],"background":false,"backgroundColor":[0,0,200,255]}]},"visualChannels":{"colorField":{"name":"Type","type":"string"},"colorScale":"customOrdinal","strokeColorField":null,"strokeColorScale":"quantile","sizeField":null,"sizeScale":"linear"}}],"effects":[],"interactionConfig":{"tooltip":
+          { "fieldsToShow": { "dthh84": [{ "name": "Country", "format": null }] }, "compareMode": false, "compareType": "absolute", "enabled": true },"brush":{"size":0.5,"enabled":false},"geocoder":{"enabled":false},"coordinate":{"enabled":false}},"layerBlending":"normal","overlayBlending":"normal","splitMaps":[],"animationConfig":{"currentTime":null,"speed":1},"editor":{"features":[],"visible":true}},"mapState":{"bearing":0,"dragRotate":false,"latitude":24.003979269312128,"longitude":-41.7669786255541,"pitch":0,"zoom":2.5420222067563674,"isSplit":false,"isViewportSynced":true,"isZoomLocked":true,"splitMapViewports":[]},"mapStyle":{"styleType":"muted","topLayerGroups":{"label":true},"visibleLayerGroups":{"label":true,"road":false,"border":false,"building":false,"water":true,"land":false,"3d building":false},"threeDBuildingColor":[233.71862868880427,230.92517894351974,226.26942936804556],"backgroundColor":[0,0,0],"mapStyles":{}},"uiState":{"mapControls":{"mapLegend":{"active":false}}}}};
+          // const config = { "version": "v1", "config": { "visState": { "filters": [{ "dataId": ["dthh84"], "id": "y0d0nimn1", "name": ["Type"], "type": "multiSelect", "value": ["Facultative", "Facultative + Treaties", "Treaties"], "plotType": { "type": "histogram" }, "animationWindow": "free", "yAxis": null, "view": "side", "speed": 1, "enabled": true }],
+          //        "layers": [{ "id": "s1ttp3d", "type": "point", "config": 
+          //        { "dataId": "dthh84", "columnMode": "points", "label": "Click to see more", "color": [255, 203, 153], "highlightColor": [252, 242, 26, 255], "columns": { "lat": "Lat", "lng": "Long" }, "isVisible": true, 
+          //        "visConfig": { "radius": 20.5, "fixedRadius": false, "opacity": 0.8, "outline": false, "thickness": 2, "strokeColor": null, "colorRange": { "colors": ["#C5A266", "#00586F", "D65F00"], "name": "Set1", "type": "qualitative", "category": "ColorBrewer" }, "strokeColorRange": { "name": "Global Warming", "type": "sequential", "category": "Uber", "colors": ["#4C0035", "#880030", "#B72F15", "#D6610A", "#EF9100", "#FFC300"] }, "radiusRange": [0, 50], "filled": true, "billboard": false, "allowHover": true, "showNeighborOnHover": false, "showHighlightColor": true }, "hidden": false, "textLabel": [{ "field": { "name": "Country", "type": "string" }, "color": [20, 105, 136], "size": 18, "offset": [0, 0], "anchor": "end", "alignment": "center", "outlineWidth": 0, "outlineColor": [255, 0, 0, 255], "background": false, "backgroundColor": [0, 0, 200, 255] }] }
+          //        , "visualChannels": { "colorField": { "name": "Type", "type": "string" }, "colorScale": "ordinal", "strokeColorField": null, "strokeColorScale": "quantile", "sizeField": null, "sizeScale": "linear" } }], "effects": [], "interactionConfig": { "tooltip": { "fieldsToShow": { "dthh84": [{ "name": "Country", "format": null }] }, "compareMode": false, "compareType": "absolute", "enabled": true }, "brush": { "size": 0.5, "enabled": false }, "geocoder": { "enabled": false }, "coordinate": { "enabled": false } }, "layerBlending": "normal", "overlayBlending": "normal", "splitMaps": [], "animationConfig": { "currentTime": null, "speed": 1 }, "editor": { "features": [], "visible": true } },
+          //        "mapState": { "bearing": -4.928571428571431, "dragRotate": true, "latitude": 27.138707184765689, "longitude": -48.6389987850586, "pitch": 0, "zoom": 2.516198957507223, "isSplit": false, "isViewportSynced": true, "isZoomLocked": true, "splitMapViewports": [] },
+          //         "mapStyle": { "styleType": "voyager", "topLayerGroups": {}, "visibleLayerGroups": { "label": false, "road": false, "border": true, "building": false, "water": true, "land": false, "3d building": false }, "threeDBuildingColor": [233.71862868880427, 230.92517894351974, 226.26942936804556], "backgroundColor": [0, 0, 0], "mapStyles": {} }, "uiState": { "mapControls": { "mapLegend": { "active": false } } } } };
+
+        // Function to initialize map with data
+      function initializeMap(data) {
+        datasets = createDatasets(data);
+        const loadedData = keplerGl.KeplerGlSchema.load(
+          datasets,
+          config
+        );
+
+        // For some reason Kepler overwrites the config without extra wait time
+        window.setTimeout(() => {
+          store.dispatch(
+            keplerGl.addDataToMap({
+              datasets: loadedData.datasets,
+              config: loadedData.config,
+              readOnly: true,
+              options: {
+                centerMap: false,
+                readOnly: true,
+                isZoomLocked: true
+              },
+              isZoomLocked: true
+            })
+          );
+
+          // Hide loading screen immediately after map renders to avoid white flashes
+          setTimeout(() => {
+            const loadingElement = document.getElementById('map-loading');
+            if (loadingElement) {
+              loadingElement.classList.add('fade-out');
+              setTimeout(() => {
+                loadingElement.style.display = 'none';
+              }, 300);
+            }
+          }, 50);
+        }, 300);
+      }
+
+      // Fetch data and initialize map
+      fetchData().then(() => {
+        initializeMap(data);
+      });
+   }(KeplerGl, store))
+  </script>
+  <style>
+    /* Responsive: move region-buttons to bottom on mobile, hide modal */
+    @media (max-width: 600px) {
+      #region-buttons {
+        left: 20px !important;
+        top: 50px !important;
+        display: block !important;
+      }
+
+      #region-modal {
+        display: none !important;
+      }
+      .flag-container {
+      top:auto !important;
+      bottom: 100% !important;/* en lugar de top: 100% */
+      transform: translateX(-50%) translateY(-10px); /* move to top */
+      }
+      #region-buttons2 {
+        top: 10px !important;
+      }
+
+      #region-buttons3 {
+        position: fixed !important;
+        bottom: 5px !important;
+        top: auto !important;
+        right: 0px !important;
+        left: auto !important;
+        flex-direction: column;
+        gap: 6px;
+        z-index: 9999;
+      }
+
+      .legend-item-text2 {
+        padding: 4px !important;
+        border-radius: 6px !important;
+        font-size: 12px !important;
+      }
+
+      .legend-item-text2 svg {
+        width: 18px !important;
+        height: 18px !important;
+      }
+
+      .legend-item-text2 span {
+        font-size: 10px !important;
+      }
+
+      .legend-item.active {
+        background-color: #00586F !important;
+        color: #fff !important;
+      }
+
+      .legend-item.active .legend-textp {
+        color: #fff !important;
+      }
+      .tab-title {
+        font-size: 16px !important;
+      }
+      .container-modal-content{
+      margin-top: 8px; width: auto; min-width: auto; max-width: 700px;
+      }
+      .map-container {
+        flex: 0 0 220px !important;
+      } 
+      .map-image {
+          width:220px !important;
+          height:auto !important;
+          max-height:320px !important;
+          margin-bottom:24px !important;
+          transition: opacity 0.4s ease !important;
+          opacity: 1 !important;
+        }
+      #countryModal {
+        align-items: flex-start !important;
+      }
+      #countryModal > div {
+        width: 98vw !important;
+        min-width: unset !important;
+        max-width: 98vw !important;
+        min-height: unset !important;
+      }
+      #countryModalContent {
+        flex-direction: column !important;
+        gap: 16px !important;
+        padding: 12px 4px !important;
+      }
+      #countryModalContent > div:first-child {
+        flex: unset !important;
+        width: 100% !important;
+        align-items: center !important;
+        justify-content: center !important;
+      }
+      #countryModalContent img {
+        width: 90vw !important;
+        max-width: 150px !important;
+        margin-bottom: 2px !important;
+      }
+      #countryModalContent h2 {
+        font-size: 1.4em !important;
+        margin-bottom: 4px !important;
+      }
+      #countryModalContent > div:last-child {
+        min-width: unset !important;
+        width: 100% !important;
+      }
+      #countryModal .fa-user-group {
+        font-size: 20px !important;
+      }
+      #countryModal ul {
+        font-size: 1em !important;
+      }
+
+      #countryModal button {
+        top: 8px !important;
+        right: 8px !important;
+        width: 28px !important;
+        height: 28px !important;
+        font-size: 16px !important;
+      }
+      #countryModal .fa-solid {
+        font-size: 1.1em !important;
+        margin-right: 6px !important;
+      }
+      #countryModal .fa-file-alt {
+        font-size: 1.1em !important;
+      }
+      #countryModal .fa-clock {
+        font-size: 1.1em !important;
+      }
+      #countryModal .fa-map-marker-alt {
+        font-size: 1.1em !important;
+      }
+      #countryModal > div > div[style*="display:flex;"] {
+        flex-direction: column !important;
+        gap: 12px !important;
+        padding: 0 !important;
+        margin-bottom: 6px !important;
+      }
+      #countryModal > div > div[style*="padding:12px 32px 0px;"] {
+        flex-direction: row !important;
+        gap: 16px !important;
+        padding: 8px 4px 0px !important;
+        font-size: 1em !important;
+      }
+      #countryModal .fa-user-group {
+        margin-bottom: 4px !important;
+      }
+      #countryModal .fa-solid {
+        vertical-align: middle !important;
+      }
+      #countryModal .fa-solid + b {
+        vertical-align: middle !important;
+      }
+      #countryModal .fa-solid {
+        color: #ff7300 !important;
+      }
+      #countryModalContent > div {
+        margin-bottom: 0 !important;
+        margin-top: 0 !important;
+      }
+      #countryModalContent > div > div {
+        margin-bottom: 0 !important;
+      }
+      #countryModalContent > div > div > ul {
+        margin-bottom: 0 !important;
+      }
+      #countryModalContent > div > div > ul > li {
+        margin-bottom: 6px !important;
+      }
+      #countryModalContent > div > div > div {
+        margin-bottom: 6px !important;
+      }
+      .fa-map-marker{
+        font-size: 18px !important;
+      }
+    }
+    @media (max-width: 900px) {
+      #countryModal > div {
+        width: 95vw !important;
+        max-width: 95vw !important;
+        min-width: unset !important;
+        height: auto !important;
+      }
+      #countryModalContent {
+        gap: 24px !important;
+        padding: 18px 8px !important;
+      }
+      #countryModalContent img {
+        width: 60vw !important;
+        max-width: 150px !important;
+      }
+      .text-modal{
+        font-size:12px !important;
+      }
+     .container-modal-content{
+      margin-top: 8px; width: auto; min-width: auto; max-width: 700px;
+    }
+
+    }
+  </style>
+<!-- Modal personalizado para país -->
+<div id="countryModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;">
+  <div style="max-width:80vw;max-width:1200px;min-width:600px;min-height:55vh;margin:auto;position:relative;background:#eee;box-shadow:0 4px 32px rgba(0,0,0,0.25);">
+    <button onclick="closeCountryModal()" style="position:absolute;top:6px;right:12px;font-weight:800;width:32px;height:32px;font-size:18px;cursor:pointer;">&times;</button>
+    <div style="width:100%;display:flex;background:#ffff;">
+      <div style="padding:12px 32px 0px;display:flex;gap:42px;">
+        <span id="tabContractType" class="tab-title active" onclick="showModalTab('contract')">Type of Contract</span>
+        <span id="tabLinesBusiness" class="tab-title" onclick="showModalTab('lines')">Lines of Business</span>
+      </div>
+    </div>
+    <div id="countryModalContent" style="display:flex;flex-direction:row;gap:48px;align-items:flex-start; padding:28px 38px;">
+      <div class="map-container">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+          <h2 id="modalCountryName" style="font-size:2em;font-weight: 500; text-align:center;"></h2>
+        </div>
+        <img alt="Map" class="map-image">
+      </div>
+      <div style="flex:1;min-width:220px;">
+  <div id="modalTabContract" style="display:block;" class="container-modal-content">
+          <div style="background:#ffffff;padding:32px 16px;border-radius:12px;font-size:1.5em;">
+            <div style="font-weight:700;margin-bottom:16px;"> How we operate</div>
+            <div style="margin-bottom:16px;">
+            </div>
+            <div style="font-weight:700;margin-bottom:16px;">What you can expect</div>
+            <ul style="margin:0 0 16px 24px;padding:0;font-size:1.2em;">
+
+            </ul>
+          </div>
+        </div>
+  <div id="modalTabLines" style="display:none;" class="container-modal-content">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+function showModalTab(tab) {
+  document.getElementById('modalTabContract').style.display = tab === 'contract' ? 'block' : 'none';
+  document.getElementById('modalTabLines').style.display = tab === 'lines' ? 'block' : 'none';
+  document.getElementById('tabContractType').style.borderBottom = tab === 'contract' ? '2px solid #ff7300' : 'none';
+  document.getElementById('tabLinesBusiness').style.borderBottom = tab === 'lines' ? '2px solid #ff7300' : 'none';
+}
+function openCountryModal(name, type) {
+  // Guardar la posición actual del mapa antes de abrir el modal
+  if (window.saveCurrentMapPosition) {
+    window.saveCurrentMapPosition();
+  }
+  // Simular un click fuera del mapa (fuera de cualquier punto/bullet) para limpiar cualquier pin/fijación/tooltip
+  var appDiv = document.getElementById('app');
+  if (appDiv) {
+    var evt = new MouseEvent('contextmenu', {
+      bubbles: true,
+      cancelable: true,
+      view: window,
+      button: 2,
+      clientX: 10,
+      clientY: 10 // fuera del área de los bullets
+    });
+    appDiv.dispatchEvent(evt);
+  }
+  // Limpiar cualquier pin/fijación/tooltip en el store de Kepler.gl
+  if (window.store && window.KeplerGl) {
+    try {
+      var state = window.store.getState();
+      var kepler = state && state.keplerGl && state.keplerGl.map;
+      if (kepler && kepler.hoverInfo) {
+        window.store.dispatch(window.KeplerGl.updateMapHover({
+          mapId: 'map',
+          hover: null
+        }));
+      }
+      if (kepler && kepler.clicked) {
+        window.store.dispatch({
+          type: 'MAP_CLICK',
+          payload: { mapId: 'map', click: null }
+        });
+      }
+      if (kepler && kepler.pinned) {
+        window.store.dispatch(window.KeplerGl.toggleMapPopoverPin({
+          mapId: 'map',
+          isPinned: false
+        }));
+      }
+    } catch (e) {}
+  }
+  var countryNameEl = document.getElementById('modalCountryName');
+  var modal = document.getElementById('countryModal');
+  if (countryNameEl) countryNameEl.textContent = name;
+  if (modal) modal.style.display = 'flex';
+
+  // Fetch country data
+  var country = name ? name.trim().toUpperCase() : '';
+  var url = 'https://active-re-web-back-bhgdggh3b4amhsa0.eastus-01.azurewebsites.net/items/global_presence_countries?search=' + encodeURIComponent(country);
+  var secondUrl= `https://active-re-web-back-bhgdggh3b4amhsa0.eastus-01.azurewebsites.net/items/global_presence_default`;
+  (async function() {
+    try {
+      const [countryRes, titlesRes] = await Promise.all([
+        fetch(url),
+        fetch(secondUrl)
+      ]);
+      const countryData = await countryRes.json();
+      const titles = await titlesRes.json();
+      if (!countryData || !countryData.data || !countryData.data[0]) return;
+      var info = countryData.data[0];
+      var title = titles.data;
+    // Map SVG
+        var mapImg = document.querySelector('#countryModalContent img');
+        mapImg.src = `/maps/${country}.svg`;
+      // Contract Type tab
+      document.getElementById('modalTabContract').innerHTML = `
+        <div style="background:#ffff;padding:18px 16px;border-radius:8px;">
+          <div style="font-weight:600;margin-bottom:8px;">
+          ${title?.type_title}</div>
+          <div style="margin-bottom:16px;">
+            ${info?.treaty_content? `<span class="text-modal" style="display:flex;align-items:start;gap:4px;"><div>🔸</div><div>${title?.treaty_title}: <span class="text-modal" style="color:#70767c;">${info?.treaty_content}</span></div></span>`:''}
+            ${info?.facultative_content? `<span class="text-modal" style="display:flex;align-items:start;gap:4px;"><div>🔸</div><div>${title?.facultative_title}: <span class="text-modal" style="color:#70767c;"> ${info?.facultative_content}</span></div></span>`:''}
+            ${info?.mgas? `<span class="text-modal" style="display:flex;align-items:start;gap:4px;"><div>🔸</div><div>${title?.mgas_title}: <span  class="text-modal"style="color:#70767c;">${info?.mgas}</span></div></span>`:''}
+          </div>
+          <div style="font-weight:600;margin-bottom:8px;">${title?.attention_title}</div>
+          <ul style="font-size:1em;">
+            <li class="text-modal" style="display:flex;align-items:start;gap:8px;">
+              <div>🕗</div> <div>${title?.response_times_title}: <span style="color:#70767c;">${info?.response_time || ''}</span></div>
+            </li>
+            <li class="text-modal" style="display:flex;align-items:start;gap:8px;">
+              <div>📍</div> <div>${title?.placement_title}: <span style="color:#70767c;">${info?.placement || ''}</span></div>
+            </li>
+            <li class="text-modal" style="display:flex;align-items:start;gap:8px;">
+              <div>📄</div> <div>${title?.documentation_title}: <span style="color:#70767c;">${info?.documentation || ''}</span></div>
+            </li>
+          </ul>
+        </div>
+      `;
+      // Lines of Business tab
+      var linesHtml = `<div style="background:#ffff;padding:18px 16px;border-radius:8px;">
+          <div style="font-weight:600;margin-bottom:8px;">${title?.lines_of_business_title}</div>
+      <ul style="font-size:1em;">
+        `;
+      if (Array.isArray(info.lines)) {
+        info.lines.forEach(line => {
+          linesHtml += `<li class="text-modal">🔸 ${line}</li>`;
+        });
+      }
+      linesHtml += `
+      <div style="margin-top:16px;margin-bottom:6px;font-size:1em;">🔗 Learn more in our <a style="color:#ff7300;" href="/lines-of-business" target="_blank">Lines of Business</a> section</div>
+      <div style="margin-top:6px;margin-bottom:16px;font-size:1em;">📩 Contact our <a style="color:#ff7300;" href="/our-team" target="_blank">Underwriting Team </a> directly</div>
+
+      </ul> </div></div> `;
+      document.getElementById('modalTabLines').innerHTML = linesHtml;
+    } catch (err) {
+      console.error('Error fetching country or titles data:', err);
+    }
+  })();
+}
+function closeCountryModal() {
+  // Restaurar la posición y datos iniciales del mapa al cerrar el modal
+  if (window.restoreMapState) {
+    window.restoreMapState();
+  }
+  // Quitar cualquier punto fijado/seleccionado en Kepler.gl
+  if (window.store && window.KeplerGl) {
+    try {
+      var state = window.store.getState();
+      var kepler = state && state.keplerGl && state.keplerGl.map;
+      // Quitar hoverInfo
+      if (kepler && kepler.hoverInfo) {
+        window.store.dispatch(window.KeplerGl.updateMapHover({
+          mapId: 'map',
+          hover: null
+        }));
+      }
+      // Quitar clicked (punto seleccionado)
+      if (kepler && kepler.clicked) {
+        window.store.dispatch({
+          type: 'MAP_CLICK',
+          payload: { mapId: 'map', click: null }
+        });
+      }
+      // Quitar pin (punto fijado)
+      if (kepler && kepler.pinned) {
+        window.store.dispatch(window.KeplerGl.toggleMapPopoverPin({
+          mapId: 'map',
+          isPinned: false
+        }));
+      }
+    } catch (e) {}
+  }
+
+  // Simular click sobre el SVG que cierra el pin/fijación
+  var pinSvg = document.querySelector('svg.data-ex-icons-pin');
+  if (pinSvg) {
+    var evt = new MouseEvent('click', {
+      bubbles: true,
+      cancelable: true,
+      view: window,
+      button: 0,
+      buttons: 0,
+      clientX: pinSvg.getBoundingClientRect().left + 1,
+      clientY: pinSvg.getBoundingClientRect().top + 1
+    });
+    pinSvg.dispatchEvent(evt);
+    // Esperar brevemente y luego cerrar el modal personalizado
+      var modal = document.getElementById('countryModal');
+      if (modal) {
+        modal.style.display = 'none';
+        modal.classList.remove('show', 'active');
+        document.getElementById('modalCountryName').textContent = '';
+        void modal.offsetWidth;
+      }
+  } else {
+    // Si no hay pin, cerrar el modal normalmente
+    var modal = document.getElementById('countryModal');
+    if (modal) {
+      modal.style.display = 'none';
+      modal.classList.remove('show', 'active');
+      document.getElementById('modalCountryName').textContent = '';
+      void modal.offsetWidth;
+    }
+  }
+  // Eliminar todos los tooltips/popovers de Kepler del DOM
+  var popovers = document.querySelectorAll('.map-popover');
+  popovers.forEach(function(popover) {
+    popover.style.display = 'none';
+    popover.classList.remove('active', 'pinned');
+    void popover.offsetWidth;
+  });
+}
+
+// Interceptar el tooltip de Kepler.gl y mostrar el modal personalizado solo al hacer click
+document.addEventListener('click', function(e) {
+  var popover = document.querySelector('.map-popover');
+  if (popover && popover.style.display !== 'none') {
+    // Extraer nombre y tipo del tooltip
+    var country = '';
+    var type = '';
+    var rows = popover.querySelectorAll('table tr');
+    rows.forEach(function(row) {
+      var cells = row.querySelectorAll('td');
+      if (cells.length === 2) {
+        var label = cells[0].textContent.trim();
+        var value = cells[1].textContent.trim();
+        if (/country/i.test(label)) country = value;
+        if (/type/i.test(label)) type = value;
+      }
+    });
+    if (country) {
+      openCountryModal(country, type);
+    }
+  }
+});
+
+// Cerrar el modal al hacer click fuera del contenido
+var modalOverlay = document.getElementById('countryModal');
+if (modalOverlay) {
+  modalOverlay.addEventListener('click', function(e) {
+    if (e.target === modalOverlay) {
+      closeCountryModal();
+    }
+  });
+}
+// Prevenir cierre al hacer click dentro del contenido
+var modalContent = document.getElementById('countryModalContent');
+if (modalContent) {
+  modalContent.addEventListener('click', function(e) {
+    e.stopPropagation();
+  });
+}
+</script>
+</body>
+
+</html>

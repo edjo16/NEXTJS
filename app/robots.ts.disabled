@@ -1,0 +1,14 @@
+import { MetadataRoute } from 'next'
+
+// This file is not compatible with output: 'export'
+// Create public/robots.txt instead
+export default function robots(): MetadataRoute.Robots {
+  return {
+    rules: {
+      userAgent: '*',
+      allow: '/',
+      disallow: ['/api/', '/t/'],
+    },
+    sitemap: 'https://active-re.com/sitemap.xml',
+  }
+}

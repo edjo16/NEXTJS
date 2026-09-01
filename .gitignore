@@ -1,0 +1,56 @@
+# Dependencias
+node_modules
+.pnp
+.pnp.js
+
+# Next.js
+.next
+out
+dist
+.turbo
+
+# Producción
+build
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+build.log
+build-final.log
+
+# Variables de entorno
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*.local
+
+# Sistema
+.DS_Store
+*.pem
+Thumbs.db
+
+# Debugging
+.vscode
+.idea
+
+# Testing
+coverage
+.nyc_output
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Archivos obsoletos (no usar)
+docker-compose.yml
+standalone.ps1
+
+# Scripts temporales
+cleanup.ps1
+.agents
+skills-lock.json
+.graphify-out

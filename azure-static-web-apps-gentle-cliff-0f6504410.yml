@@ -1,0 +1,96 @@
+# ─────────────────────────────────────────────────────────
+# Azure Pipeline – Next.js con Docker directo a App Service
+# NO requiere Azure Container Registry
+# ─────────────────────────────────────────────────────────
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  azureSubscription: 'web_front_connection'
+  appName: 'active-re-next-web-front'
+  envDirectusUrl: 'https://active-re-web-back-bhgdggh3b4amhsa0.eastus-01.azurewebsites.net'
+  envDownloadEmailEndpoint: ''
+
+stages:
+
+- stage: Build
+  displayName: 'Build Next.js App'
+  jobs:
+  - job: Build
+    steps:
+
+    # 1️⃣ Checkout del código
+    - checkout: self
+
+    # 2️⃣ Instalamos Node 20
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '20.x'
+      displayName: 'Use Node 20'
+
+    # 3️⃣ Instalar dependencias
+    - script: |
+        npm ci
+      displayName: 'npm install'
+
+    # 4️⃣ Build con variables de entorno
+    - script: |
+        export NEXT_PUBLIC_DIRECTUS_URL=$(envDirectusUrl)
+        export NEXT_PUBLIC_DOWNLOAD_EMAIL_ENDPOINT=$(envDownloadEmailEndpoint)
+        npm run build
+      displayName: 'Build Next.js App'
+
+    # 5️⃣ Preparar archivos para deployment standalone
+    - script: |
+        mkdir -p deploy
+        cp -r .next/standalone/. deploy/
+        cp -r .next/static deploy/.next/static
+        cp -r public deploy/public
+      displayName: 'Prepare standalone deployment'
+
+    # 6️⃣ Comprimir solo los archivos necesarios
+    - task: ArchiveFiles@2
+      inputs:
+        rootFolderOrFile: '$(Build.SourcesDirectory)/deploy'
+        includeRootFolder: false
+        archiveType: 'zip'
+        archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+      displayName: 'Archive files'
+
+    # 7️⃣ Publicar artefacto
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'drop'
+      displayName: 'Publish Artifact'
+
+- stage: Deploy
+  displayName: 'Deploy to App Service'
+  dependsOn: Build
+  jobs:
+  - job: Deploy
+    steps:
+
+    # 1️⃣ Descargar artefacto
+    - task: DownloadBuildArtifacts@0
+      inputs:
+        buildType: 'current'
+        downloadType: 'single'
+        artifactName: 'drop'
+        downloadPath: '$(System.ArtifactsDirectory)'
+      displayName: 'Download Artifact'
+
+    # 2️⃣ Deploy a App Service como Web App (no container)
+    - task: AzureWebApp@1
+      displayName: 'Deploy to Azure App Service'
+      inputs:
+        azureSubscription: '$(azureSubscription)'
+        appType: 'webAppLinux'
+        appName: '$(appName)'
+        package: '$(System.ArtifactsDirectory)/drop/$(Build.BuildId).zip'
+        runtimeStack: 'NODE|20-lts'
+        startUpCommand: 'node server.js'
+        appSettings: -NEXT_PUBLIC_DIRECTUS_URL $(envDirectusUrl) -NEXT_PUBLIC_DOWNLOAD_EMAIL_ENDPOINT $(envDownloadEmailEndpoint) -WEBSITES_PORT 8080

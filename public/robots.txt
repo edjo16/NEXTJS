@@ -1,0 +1,33 @@
+# Active Re - Robots.txt
+# Allow Access to bots
+
+User-agent: *
+Allow: /
+
+# Priv 
+Disallow: /t/
+Disallow: /t
+Disallow: /map.gl.html
+
+# Sitemap
+Disallow: /staticwebapp.config.json
+Disallow: /*.json$
+
+# Sitemap principal
+Sitemap: https://active-re.com/sitemap.xml
+
+# Crawl-delay
+User-agent: Googlebot
+Crawl-delay: 0
+Allow: /
+
+User-agent: Bingbot
+Crawl-delay: 0
+Allow: /
+
+# Others bots 
+User-agent: Baiduspider
+Crawl-delay: 1
+
+User-agent: Yandex
+Crawl-delay: 1

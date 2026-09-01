@@ -1,0 +1,29 @@
+import { MetadataRoute } from 'next'
+
+export default function sitemap(): MetadataRoute.Sitemap {
+  const baseUrl = 'https://active-re.com'
+  
+  const routes = [
+    '',
+    '/about-us',
+    '/annual-report',
+    '/careers',
+    '/compliance',
+    '/contacts',
+    '/cookies',
+    '/finnancial-information',
+    '/insights',
+    '/lines-of-business',
+    '/news',
+    '/our-team',
+    '/privacy',
+    '/terms',
+  ]
+
+  return routes.map((route) => ({
+    url: `${baseUrl}${route}`,
+    lastModified: new Date(),
+    changeFrequency: route === '' ? 'daily' : 'weekly',
+    priority: route === '' ? 1 : 0.8,
+  }))
+}
