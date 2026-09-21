@@ -53,7 +53,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: RootLayoutProps) {
   const directusOrigin = process.env.NEXT_PUBLIC_DIRECTUS_URL;
   return (
-    <html lang="en">
+    <html lang="en" data-scroll-behavior="smooth">
       <head>
         {directusOrigin && (
           <>

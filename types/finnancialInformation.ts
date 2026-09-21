@@ -15,9 +15,9 @@ export interface WrittenPremiums {
 
 export interface UnderwrittenRatio {
   status: string,
-  year: number,
-  underwritten_income: string,
-  combined_ratio: string,
+  year: number | string,
+  underwritten_income: string | number,
+  combined_ratio: string | number,
   [key: string]: any
 }
 
@@ -85,6 +85,52 @@ export interface FinancialInformationCharts {
   // audited_finnancial_statements: FinnancialStatements[];
   // ranking: ranking[];
 }
+/* ------------------------------------------------------------------ */
+/* Derived / view-model types used by the "Key Financial Indicators"   */
+/* layout (components/finnancial_information/v2).                      */
+/* ------------------------------------------------------------------ */
+
+/** Generic point for single-series charts (USD million). */
+export interface ChartPoint {
+  year: string;
+  value: number;
+}
+
+/** Point for the Underwritten Result & Combined Ratio chart. */
+export interface UnderwritingPoint {
+  year: string;
+  result: number;
+  ratio: number | null;
+}
+
+/** Point for the Shareholders' Equity chart (total + breakdown). */
+export interface EquityPoint {
+  year: string;
+  value: number;
+  share_additional_paidin_capital: number;
+  retained_earnings: number;
+  retained_premiums: number;
+}
+
+/** Year-over-year variation computed from the two latest data points. */
+export interface KpiSummary {
+  latestYear: string | null;
+  latestValue: number | null;
+  previousValue: number | null;
+  /** Percentage change (e.g. 11.1). Null when it cannot be computed. */
+  changePct: number | null;
+}
+
+/** Group of audited statements belonging to one auditor. */
+export interface AuditorGroup {
+  key: string;
+  name: string;
+  logo: string | null;
+  statements: FinnancialStatements[];
+  firstYear: string | null;
+  lastYear: string | null;
+}
+
 export interface UseDataResult {
     data: FinancialInformationPageData | null;
     isLoading: boolean;

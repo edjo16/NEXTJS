@@ -18,11 +18,24 @@ const nextConfig = {
       },
     ],
     unoptimized: false,
+    // Next.js 16 subio el default de 60s a 4h (14400s). Como las imagenes vienen
+    // de Directus y los editores las reemplazan en caliente, mantenemos 60s.
+    minimumCacheTTL: 60,
+    // Next.js 16 saco el 16 del default de imageSizes. Lo restauramos para que el
+    // srcset generado sea identico al de Next 15.
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    // Next.js 16 bloquea la optimizacion contra IPs locales por defecto (SSRF).
+    // El remotePattern de localhost:8055 es solo para el Directus de desarrollo.
+    dangerouslyAllowLocalIP: process.env.NODE_ENV !== 'production',
   },
-  webpack: (config) => {
-    config.resolve.alias.canvas = false;
-    config.resolve.alias.encoding = false;
-    return config;
+  // Next.js 16 usa Turbopack por defecto. Equivalente al viejo
+  // `webpack: config.resolve.alias.canvas/encoding = false`, necesario porque
+  // pdfjs-dist (react-pdf) hace require() opcional de modulos solo-Node.
+  turbopack: {
+    resolveAlias: {
+      canvas: './empty-module.js',
+      encoding: './empty-module.js',
+    },
   },
   async redirects() {
     return [

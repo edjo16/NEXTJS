@@ -25,7 +25,7 @@ stages:
     # 1️⃣ Checkout del código
     - checkout: self
 
-    # 2️⃣ Instalamos Node 20
+    # 2️⃣ Instalamos Node 20 (Next.js 16 requiere >= 20.9.0; 20.x resuelve a 20.19+)
     - task: NodeTool@0
       inputs:
         versionSpec: '20.x'

@@ -1,4 +1,6 @@
 # Etapa 1: Construcción
+# Next.js 16 requiere Node >= 20.9.0. El tag node:20-alpine resuelve a 20.19.x,
+# por lo que cumple. Si se pinea una version 20.x menor, el build falla.
 FROM node:20-alpine AS builder
 
 WORKDIR /app
